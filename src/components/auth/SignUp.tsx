@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Field, FieldLabel, FieldControl, FieldError } from "@/components/ui/field"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardPanel } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardPanel, CardFooter } from "@/components/ui/card"
 import { Select, SelectTrigger, SelectValue, SelectPopup, SelectItem } from "@/components/ui/select"
 import { PREMIER_LEAGUE_TEAMS } from "@/types/teams"
 import { 
@@ -201,6 +201,14 @@ export const SignUp = () => {
                     </Button>
                 </Form>
             </CardPanel>
+            <CardFooter className="justify-center">
+                <span className="text-sm text-muted-foreground">
+                    Already have an account?{" "}
+                    <a href="/sign-in" className="underline">
+                        Sign in
+                    </a>
+                </span>
+            </CardFooter>
         </Card>
     )
 }

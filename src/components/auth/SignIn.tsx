@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Field, FieldLabel, FieldControl, FieldError } from "@/components/ui/field"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
-import { Card, CardHeader, CardTitle, CardPanel } from "@/components/ui/card"
+import { Card, CardHeader, CardTitle, CardPanel, CardFooter } from "@/components/ui/card"
 import { 
     SignInFormData, 
     ValidationErrors, 
@@ -93,6 +93,14 @@ export const SignIn = () => {
                     </Button>
                 </Form>
             </CardPanel>
+            <CardFooter className="justify-center">
+                <span className="text-sm text-muted-foreground">
+                    Don't have an account?{" "}
+                    <a href="/sign-up" className="underline">
+                        Sign up
+                    </a>
+                </span>
+            </CardFooter>
         </Card>
     )
 }
