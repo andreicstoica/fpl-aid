@@ -1,11 +1,12 @@
-import { authClient } from "@/utils/auth-client"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
+import { useNavigate, Link } from "@tanstack/react-router"
 import { Field, FieldLabel, FieldControl, FieldError } from "@/components/ui/field"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardPanel, CardFooter } from "@/components/ui/card"
 import { Select, SelectTrigger, SelectValue, SelectPopup, SelectItem } from "@/components/ui/select"
+import { toastManager } from "@/components/ui/toast"
 import { PREMIER_LEAGUE_TEAMS } from "@/types/teams"
 import { 
     SignUpFormData, 
@@ -13,31 +14,66 @@ import {
     validateSignUpForm, 
     validateSignUpField 
 } from "@/utils/form-utils"
+import type { SignUpPayload, SignUpResponse } from "@/types/signup"
 
 export const SignUp = () => {
+    const navigate = useNavigate()
+    
     const signUpMutation = useMutation({
-        mutationFn: async ({ 
-            name, 
-            email, 
-            password, 
-            fplTeamId: _fplTeamId,
-            fplLeagueId: _fplLeagueId,
-            favoriteTeam: _favoriteTeam
-        }: { 
-            name: string
-            email: string
-            password: string
-            fplTeamId: string
-            fplLeagueId: string
-            favoriteTeam: string
-        }) => {
-            // For now, just pass the basic auth fields
-            // TODO: Update auth client to handle FPL fields
-            return await authClient.signUp.email({ 
-                email, 
-                password,
-                name
+        mutationFn: async (payload: SignUpPayload): Promise<SignUpResponse> => {
+            const response = await fetch('/api/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
             })
+            
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(JSON.stringify(errorData))
+            }
+            
+            return await response.json()
+        },
+        onSuccess: (data) => {
+            if (data.success) {
+                toastManager.add({
+                    type: 'success',
+                    title: 'Account Created!',
+                    description: 'Welcome to FPL Aid! Redirecting to dashboard...',
+                })
+                
+                // Redirect to dashboard after a short delay
+                setTimeout(() => {
+                    navigate({ to: '/' })
+                }, 1500)
+            }
+        },
+        onError: (error) => {
+            try {
+                const errorData = JSON.parse(error.message) as SignUpResponse
+                
+                if (errorData.errors?.fplTeamId) {
+                    setErrors(prev => ({ ...prev, fplTeamId: errorData.errors!.fplTeamId }))
+                }
+                if (errorData.errors?.fplLeagueId) {
+                    setErrors(prev => ({ ...prev, fplLeagueId: errorData.errors!.fplLeagueId }))
+                }
+                if (errorData.errors?.general) {
+                    toastManager.add({
+                        type: 'error',
+                        title: 'Signup Failed',
+                        description: errorData.errors.general,
+                    })
+                }
+            } catch {
+                toastManager.add({
+                    type: 'error',
+                    title: 'Signup Failed',
+                    description: 'An unexpected error occurred. Please try again.',
+                })
+            }
         },
     })
     const [formData, setFormData] = useState<SignUpFormData>({
@@ -76,12 +112,13 @@ export const SignUp = () => {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (validateForm()) {
-            // TODO: Store FPL data when auth client supports it
-            console.log('FPL Data:', { 
-                fplTeamId: formData.fplTeamId, 
-                fplLeagueId: formData.fplLeagueId, 
-                favoriteTeam: formData.favoriteTeam 
+            // Show loading toast
+            toastManager.add({
+                type: 'loading',
+                title: 'Creating Account...',
+                description: 'Validating FPL data and creating your account...',
             })
+            
             signUpMutation.mutate({ 
                 name: formData.name, 
                 email: formData.email, 
@@ -204,9 +241,9 @@ export const SignUp = () => {
             <CardFooter className="justify-center">
                 <span className="text-sm text-muted-foreground">
                     Already have an account?{" "}
-                    <a href="/sign-in" className="underline">
+                    <Link to="/sign-in" className="underline">
                         Sign in
-                    </a>
+                    </Link>
                 </span>
             </CardFooter>
         </Card>

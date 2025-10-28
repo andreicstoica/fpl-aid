@@ -15,6 +15,20 @@
       "when": 1761679120578,
       "tag": "0001_thick_sally_floyd",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1761684347349,
+      "tag": "0002_gigantic_triathlon",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1761685065152,
+      "tag": "0003_cuddly_ares",
+      "breakpoints": true
     }
   ]
 }

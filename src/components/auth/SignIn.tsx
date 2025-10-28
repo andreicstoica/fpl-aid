@@ -1,10 +1,12 @@
 import { authClient } from "@/utils/auth-client"
 import { useMutation } from "@tanstack/react-query"
 import { useState } from "react"
+import { useNavigate, Link } from "@tanstack/react-router"
 import { Field, FieldLabel, FieldControl, FieldError } from "@/components/ui/field"
 import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardPanel, CardFooter } from "@/components/ui/card"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { 
     SignInFormData, 
     ValidationErrors, 
@@ -13,9 +15,42 @@ import {
 } from "@/utils/form-utils"
 
 export const SignIn = () => {
+    const navigate = useNavigate()
+    
     const signInMutation = useMutation({
         mutationFn: async ({ email, password }: { email: string, password: string }) => {
             return await authClient.signIn.email({ email, password })
+        },
+        onSuccess: (data) => {
+            // Check if the response contains an error
+            if (data?.error) {
+                setAuthError(data.error.message || 'An error occurred during sign in.')
+                return
+            }
+            
+            // Check if user is null (indicating failed authentication)
+            if (!data?.data?.user) {
+                setAuthError('Invalid email or password. Please check your credentials and try again.')
+                return
+            }
+            
+            navigate({ to: '/' })
+        },
+        onError: (error: any) => {
+            console.error('Sign-in error:', error)
+            
+            // Extract error message from Better Auth error response
+            let errorMessage = 'An error occurred during sign in. Please try again.'
+            
+            if (error?.message) {
+                errorMessage = error.message
+            } else if (error?.status === 401) {
+                errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+            } else if (error?.status === 422) {
+                errorMessage = 'Invalid email or password. Please check your credentials and try again.'
+            }
+            
+            setAuthError(errorMessage)
         },
     })
     
@@ -24,6 +59,7 @@ export const SignIn = () => {
         password: ""
     })
     const [errors, setErrors] = useState<ValidationErrors<SignInFormData>>({})
+    const [authError, setAuthError] = useState<string | null>(null)
 
     const validateForm = () => {
         const newErrors = validateSignInForm(formData)
@@ -33,7 +69,11 @@ export const SignIn = () => {
 
     const handleInputChange = (field: keyof SignInFormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({ ...prev, [field]: e.target.value }))
-        // Don't clear errors immediately - let them persist until validation runs again
+        // Clear auth error when user starts typing
+        if (authError) {
+            setAuthError(null)
+        }
+        // Don't clear validation errors immediately - let them persist until validation runs again
     }
 
     const handleInputBlur = (field: keyof SignInFormData) => () => {
@@ -44,6 +84,9 @@ export const SignIn = () => {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        // Clear any previous auth errors
+        setAuthError(null)
+        
         if (validateForm()) {
             signInMutation.mutate({ email: formData.email, password: formData.password })
         }
@@ -84,6 +127,12 @@ export const SignIn = () => {
                         {errors.password && <FieldError>{errors.password}</FieldError>}
                     </Field>
                     
+                    {authError && (
+                        <Alert variant="error">
+                            <AlertDescription>{authError}</AlertDescription>
+                        </Alert>
+                    )}
+                    
                     <Button 
                         type="submit" 
                         className="w-full"
@@ -96,9 +145,9 @@ export const SignIn = () => {
             <CardFooter className="justify-center">
                 <span className="text-sm text-muted-foreground">
                     Don't have an account?{" "}
-                    <a href="/sign-up" className="underline">
+                    <Link to="/sign-up" className="underline">
                         Sign up
-                    </a>
+                    </Link>
                 </span>
             </CardFooter>
         </Card>

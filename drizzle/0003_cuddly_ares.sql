@@ -1,0 +1,1 @@
+ALTER TABLE "user_team_data" ALTER COLUMN "id" SET DEFAULT '7d5fe10c-b7c7-4ddd-9cad-df6bd10931b7';
