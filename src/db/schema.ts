@@ -6,6 +6,9 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  fplTeamId: text("fpl_team_id"),
+  fplLeagueId: text("fpl_league_id"),
+  favoriteTeam: text("favorite_team"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

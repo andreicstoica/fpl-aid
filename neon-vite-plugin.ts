@@ -7,4 +7,5 @@ export default postgresPlugin({
   },
   referrer: 'create-tanstack',
   dotEnvKey: 'VITE_DATABASE_URL',
+  disableAutoClaim: true,
 })

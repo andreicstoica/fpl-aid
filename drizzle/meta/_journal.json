@@ -8,6 +8,13 @@
       "when": 1761675787610,
       "tag": "0000_goofy_expediter",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761679120578,
+      "tag": "0001_thick_sally_floyd",
+      "breakpoints": true
     }
   ]
 }
