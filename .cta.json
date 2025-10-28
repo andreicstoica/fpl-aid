@@ -1,0 +1,22 @@
+{
+  "projectName": "fpl-aid",
+  "mode": "file-router",
+  "typescript": true,
+  "tailwind": true,
+  "packageManager": "bun",
+  "addOnOptions": {
+    "drizzle": {
+      "database": "postgresql"
+    }
+  },
+  "git": true,
+  "version": 1,
+  "framework": "react-cra",
+  "chosenAddOns": [
+    "biome",
+    "start",
+    "neon",
+    "drizzle",
+    "tanstack-query"
+  ]
+}
