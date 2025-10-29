@@ -136,6 +136,7 @@ export interface LeagueComparison {
 		avgPointsPerWeek: number;
 	};
 	pointsGap: number;
+	ppwGap: number; // Points per week gap (positive = behind, negative = ahead)
 	userAvgPointsPerWeek: number;
 }
 

@@ -175,6 +175,7 @@ export const Route = createFileRoute('/api/fpl-dashboard')({
             if (rivalAbove) {
               const rivalPoints = rivalAbove.total
               const rivalAvgPPW = calculateAvgPointsPerWeek(rivalPoints, currentEvent)
+              const ppwGap = userAvgPPW - rivalAvgPPW
               
               league = {
                 userRank,
@@ -184,6 +185,7 @@ export const Route = createFileRoute('/api/fpl-dashboard')({
                   avgPointsPerWeek: rivalAvgPPW
                 },
                 pointsGap: rivalPoints - userPoints,
+                ppwGap,
                 userAvgPointsPerWeek: userAvgPPW
               }
             } else {
@@ -196,6 +198,7 @@ export const Route = createFileRoute('/api/fpl-dashboard')({
                   avgPointsPerWeek: userAvgPPW
                 },
                 pointsGap: 0,
+                ppwGap: 0,
                 userAvgPointsPerWeek: userAvgPPW
               }
             }
@@ -212,6 +215,7 @@ export const Route = createFileRoute('/api/fpl-dashboard')({
                 avgPointsPerWeek: 0
               },
               pointsGap: 0,
+              ppwGap: 0,
               userAvgPointsPerWeek: 0
             }
           }
