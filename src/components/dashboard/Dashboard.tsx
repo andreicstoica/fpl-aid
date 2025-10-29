@@ -1,82 +1,93 @@
-import { useQuery } from '@tanstack/react-query'
-import type { FplDashboardData } from '@/types/fpl'
-import { ManagerStats } from './ManagerStats'
-import { LeagueStats } from './LeagueStats'
-import { SoccerField } from './SoccerField'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Empty, EmptyHeader, EmptyTitle, EmptyDescription } from '@/components/ui/empty'
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { useQuery } from "@tanstack/react-query";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+	Empty,
+	EmptyDescription,
+	EmptyHeader,
+	EmptyTitle,
+} from "@/components/ui/empty";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { FplDashboardData } from "@/types/fpl";
+import { LeagueStats } from "./LeagueStats";
+import { ManagerStats } from "./ManagerStats";
+import { SoccerField } from "./SoccerField";
 
 export function Dashboard() {
-  const { data: dashboardData, isLoading, error } = useQuery<FplDashboardData>({
-    queryKey: ['fpl-dashboard'],
-    queryFn: async () => {
-      const response = await fetch('/api/fpl-dashboard')
-      if (!response.ok) {
-        throw new Error('Failed to fetch dashboard data')
-      }
-      return response.json()
-    },
-    retry: false
-  })
+	const {
+		data: dashboardData,
+		isLoading,
+		error,
+	} = useQuery<FplDashboardData>({
+		queryKey: ["fpl-dashboard"],
+		queryFn: async () => {
+			const response = await fetch("/api/fpl-dashboard");
+			if (!response.ok) {
+				throw new Error("Failed to fetch dashboard data");
+			}
+			return response.json();
+		},
+		retry: false,
+	});
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center py-8">
-        <div className="mx-auto px-4 w-full">
-          <Skeleton className="h-10 w-64 mx-auto mb-8" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Skeleton className="h-48" />
-            <Skeleton className="h-48" />
-          </div>
-          <Skeleton className="h-96" />
-        </div>
-      </div>
-    )
-  }
+	if (isLoading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center py-8">
+				<div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+					<Skeleton className="mx-auto mb-8 h-10 w-full max-w-xs sm:max-w-sm" />
+					<div className="mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+						<Skeleton className="h-48 w-full sm:h-56" />
+						<Skeleton className="h-48 w-full sm:h-56" />
+					</div>
+					<Skeleton className="h-80 w-full sm:h-96" />
+				</div>
+			</div>
+		);
+	}
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center py-8">
-        <div className="mx-auto px-4 w-full">
-          <Alert variant="error" className="max-w-2xl mx-auto">
-            <AlertTitle>Error loading dashboard</AlertTitle>
-            <AlertDescription>{(error as Error).message}</AlertDescription>
-          </Alert>
-        </div>
-      </div>
-    )
-  }
+	if (error) {
+		return (
+			<div className="min-h-screen flex items-center justify-center py-8">
+				<div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+					<Alert variant="error" className="max-w-2xl mx-auto">
+						<AlertTitle>Error loading dashboard</AlertTitle>
+						<AlertDescription>{(error as Error).message}</AlertDescription>
+					</Alert>
+				</div>
+			</div>
+		);
+	}
 
-  if (!dashboardData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center py-8">
-        <div className="mx-auto px-4 w-full">
-          <Empty>
-            <EmptyHeader>
-              <EmptyTitle>No dashboard data available</EmptyTitle>
-              <EmptyDescription>Please check your FPL team connection.</EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        </div>
-      </div>
-    )
-  }
+	if (!dashboardData) {
+		return (
+			<div className="min-h-screen flex items-center justify-center py-8">
+				<div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+					<Empty>
+						<EmptyHeader>
+							<EmptyTitle>No dashboard data available</EmptyTitle>
+							<EmptyDescription>
+								Please check your FPL team connection.
+							</EmptyDescription>
+						</EmptyHeader>
+					</Empty>
+				</div>
+			</div>
+		);
+	}
 
-  const { roster, manager, league } = dashboardData
+	const { roster, manager, league } = dashboardData;
 
-  return (
-    <div className="min-h-screen py-8">
-      <div className="mx-auto px-4">        
-        {/* Stats Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {manager && <ManagerStats manager={manager} />}
-          {league && <LeagueStats league={league} />}
-        </div>
-        
-        {/* Soccer Field */}
-        <SoccerField roster={roster} />
-      </div>
-    </div>
-  )
+	return (
+		<div className="min-h-screen py-8 sm:py-10">
+			<div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+				{/* Stats Row */}
+				<div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+					{manager && <ManagerStats manager={manager} />}
+					{league && <LeagueStats league={league} />}
+				</div>
+
+				{/* Soccer Field */}
+				<SoccerField roster={roster} />
+			</div>
+		</div>
+	);
 }

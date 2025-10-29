@@ -181,13 +181,15 @@ export const PREMIER_LEAGUE_TEAMS: PremierLeagueTeam[] = [
 
 // Helper functions
 export const getTeamById = (id: number): PremierLeagueTeam | undefined => {
-	return PREMIER_LEAGUE_TEAMS.find(team => team.id === id);
+	return PREMIER_LEAGUE_TEAMS.find((team) => team.id === id);
 };
 
 export const getTeamByName = (name: string): PremierLeagueTeam | undefined => {
 	const normalizedName = name.trim();
-	return PREMIER_LEAGUE_TEAMS.find(team => 
-		team.aliases.some(alias => alias.toLowerCase() === normalizedName.toLowerCase())
+	return PREMIER_LEAGUE_TEAMS.find((team) =>
+		team.aliases.some(
+			(alias) => alias.toLowerCase() === normalizedName.toLowerCase(),
+		),
 	);
 };
 
