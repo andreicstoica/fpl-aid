@@ -5,12 +5,26 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/index"; // your drizzle instance
 import { userTeamData } from "@/db/schema";
 
+const defaultOrigins = ["http://localhost:3000", "http://localhost:3001", "https://fpl-aid.vercel.app"];
+const trustedOrigins = Array.from(
+	new Set(
+		[
+			process.env.ORIGIN,
+			process.env.CLIENT_ORIGIN,
+			...(process.env.TRUSTED_ORIGINS?.split(",") ?? []),
+			...defaultOrigins,
+		]
+			.map((origin) => origin?.trim())
+			.filter((origin): origin is string => Boolean(origin?.length)),
+	),
+);
+
 export const auth = betterAuth({
 	database: drizzleAdapter(db, {
 		provider: "pg",
 	}),
 
-	trustedOrigins: [process.env.ORIGIN ?? "http://localhost:3000"],
+	trustedOrigins,
 
 	emailAndPassword: {
 		enabled: true,
