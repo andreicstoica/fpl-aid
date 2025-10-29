@@ -31,39 +31,36 @@ export function SoccerField({ roster }: SoccerFieldProps) {
         </CardTitle>
       </CardHeader>
       <CardPanel className="px-0 pb-0">
-        <div className="mx-auto max-w-5xl">
-          <div className="relative overflow-hidden rounded-[42px] border-[14px] border-emerald-900/70 bg-gradient-to-b from-emerald-500 via-emerald-600 to-emerald-700 shadow-[0_40px_80px_rgba(12,83,32,0.35)]">
-            <div className="pointer-events-none absolute inset-0">
-              <div className="absolute inset-[18px] rounded-[32px] border-2 border-white/25" />
-              <div className="absolute inset-y-12 left-1/2 w-px -translate-x-1/2 bg-white/30" />
-              <div className="absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/30" />
-              <div className="absolute inset-x-[18%] top-12 h-28 rounded-b-[120px] border-2 border-white/20" />
-              <div className="absolute inset-x-[28%] top-24 h-14 rounded-b-[60px] border-2 border-white/25" />
-              <div className="absolute inset-x-[18%] bottom-12 h-28 rounded-t-[120px] border-2 border-white/20" />
-              <div className="absolute inset-x-[28%] bottom-24 h-14 rounded-t-[60px] border-2 border-white/25" />
-              <div className="absolute left-1/2 top-[19%] h-2 w-2 -translate-x-1/2 rounded-full bg-white/70" />
-              <div className="absolute left-1/2 bottom-[19%] h-2 w-2 -translate-x-1/2 rounded-full bg-white/70" />
-              <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/80" />
-            </div>
+        <div className="mx-auto">
+          <div className="relative rounded-xl shadow-lg p-1.5 md:p-3">
+            <div className="relative bg-linear-to-b from-emerald-600 via-emerald-700 to-emerald-800 rounded-lg p-4 md:p-6">
+              {/* Pitch Markings */}
+              <div className="pointer-events-none absolute inset-0 opacity-20">
+                <div className="absolute inset-4 rounded-lg border-2 border-white" />
+                <div className="absolute left-1/2 top-4 bottom-4 w-0.5 -translate-x-0.5 bg-white" />
+                <div className="absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white" />
+              </div>
 
-            <div className="relative z-10 flex flex-col gap-12 px-6 py-12 md:px-12">
-              {positionOrder.map(position => {
-                const players = playersByPosition[position] || []
-                if (players.length === 0) return null
+              {/* Players */}
+              <div className="relative z-10 flex flex-col gap-8">
+                {positionOrder.map(position => {
+                  const players = playersByPosition[position] || []
+                  if (players.length === 0) return null
 
-                return (
-                  <div key={position} className="space-y-6">
-                    <div className="text-center text-xs font-semibold uppercase tracking-[0.4em] text-emerald-50/80">
-                      {positionNames[position]}
+                  return (
+                    <div key={position} className="space-y-4">
+                      <h3 className="text-center text-xl font-semibold text-white/90">
+                        {positionNames[position]}
+                      </h3>
+                      <div className="flex flex-wrap justify-center gap-3 md:gap-4 lg:gap-6">
+                        {players.map(player => (
+                          <PlayerCard key={player.id} player={player} />
+                        ))}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap justify-center gap-5">
-                      {players.map(player => (
-                        <PlayerCard key={player.id} player={player} />
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
             </div>
           </div>
         </div>

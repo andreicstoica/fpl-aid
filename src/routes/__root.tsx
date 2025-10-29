@@ -51,7 +51,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ToastProvider>
-          {children}
+          <div className="mx-auto max-w-7xl">
+            {children}
+          </div>
         </ToastProvider>
         <TanStackDevtools
           config={{

@@ -23,7 +23,7 @@ export function Dashboard() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center py-8">
-        <div className="max-w-6xl mx-auto px-4 w-full">
+        <div className="mx-auto px-4 w-full">
           <Skeleton className="h-10 w-64 mx-auto mb-8" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <Skeleton className="h-48" />
@@ -38,7 +38,7 @@ export function Dashboard() {
   if (error) {
     return (
       <div className="min-h-screen flex items-center justify-center py-8">
-        <div className="max-w-6xl mx-auto px-4 w-full">
+        <div className="mx-auto px-4 w-full">
           <Alert variant="error" className="max-w-2xl mx-auto">
             <AlertTitle>Error loading dashboard</AlertTitle>
             <AlertDescription>{(error as Error).message}</AlertDescription>
@@ -51,7 +51,7 @@ export function Dashboard() {
   if (!dashboardData) {
     return (
       <div className="min-h-screen flex items-center justify-center py-8">
-        <div className="max-w-6xl mx-auto px-4 w-full">
+        <div className="mx-auto px-4 w-full">
           <Empty>
             <EmptyHeader>
               <EmptyTitle>No dashboard data available</EmptyTitle>
@@ -66,10 +66,8 @@ export function Dashboard() {
   const { roster, manager, league } = dashboardData
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4">
-        <h1 className="text-3xl font-bold mb-8 text-center text-gray-800">FPL Dashboard</h1>
-        
+    <div className="min-h-screen py-8">
+      <div className="mx-auto px-4">        
         {/* Stats Row */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {manager && <ManagerStats manager={manager} />}

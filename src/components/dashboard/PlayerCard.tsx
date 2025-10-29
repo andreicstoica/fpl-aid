@@ -141,10 +141,10 @@ export function PlayerCard({ player }: PlayerCardProps) {
                 key={stat.label}
                 className={cn(
                   'flex flex-1 flex-col items-center gap-0.5 px-1 py-1.5 min-w-0',
-                  index > 0 && 'border-t border-emerald-100/60 sm:border-t-0 sm:border-l'
+                  index > 0 && 'border-t-2 border-emerald-100/90 sm:border-t-0 sm:border-l-2'
                 )}
               >
-                <div className="flex items-center gap-0.5 text-[9px] uppercase tracking-[0.1em] text-emerald-700 whitespace-nowrap">
+                <div className="flex items-center gap-0.5 text-[9px] uppercase tracking-widest text-emerald-700 whitespace-nowrap">
                   {stat.icon}
                   <span className="truncate">{stat.label}</span>
                 </div>
