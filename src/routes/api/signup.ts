@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { auth } from '@/utils/auth'
-import { db } from '@/db'
+import { db } from '@/db/index'
 import { userTeamData } from '@/db/schema'
 import { validateFplData } from '@/utils/fpl-validation'
 import type { SignUpPayload, SignUpResponse } from '@/types/signup'

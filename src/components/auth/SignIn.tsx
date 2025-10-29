@@ -7,6 +7,7 @@ import { Form } from "@/components/ui/form"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardPanel, CardFooter } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { toastManager } from "@/components/ui/toast"
 import { 
     SignInFormData, 
     ValidationErrors, 
@@ -14,42 +15,59 @@ import {
     validateSignInField 
 } from "@/utils/form-utils"
 
+const DEFAULT_SIGNIN_ERROR = 'An error occurred during sign in. Please try again.'
+const INVALID_CREDENTIALS_ERROR = 'Invalid email or password. Please check your credentials and try again.'
+
 export const SignIn = () => {
     const navigate = useNavigate()
+    const fieldIds = {
+        email: "sign-in-email",
+        password: "sign-in-password",
+    } as const
+    const errorIds = {
+        email: "sign-in-email-error",
+        password: "sign-in-password-error",
+    } as const
     
     const signInMutation = useMutation({
         mutationFn: async ({ email, password }: { email: string, password: string }) => {
-            return await authClient.signIn.email({ email, password })
+            try {
+                const result = await authClient.signIn.email({ email, password })
+
+                if (result?.error) {
+                    const errorMessage = result.error.message || DEFAULT_SIGNIN_ERROR
+                    const error = new Error(errorMessage)
+                    throw error
+                }
+
+                if (!result?.data?.user) {
+                    throw new Error(INVALID_CREDENTIALS_ERROR)
+                }
+
+                return result
+            } catch (error: any) {
+                if (error?.status === 401 || error?.status === 422) {
+                    throw new Error(INVALID_CREDENTIALS_ERROR)
+                }
+                
+                if (error instanceof Error && error.message) {
+                    throw error
+                }
+
+                throw new Error(DEFAULT_SIGNIN_ERROR)
+            }
         },
-        onSuccess: (data) => {
-            // Check if the response contains an error
-            if (data?.error) {
-                setAuthError(data.error.message || 'An error occurred during sign in.')
-                return
-            }
-            
-            // Check if user is null (indicating failed authentication)
-            if (!data?.data?.user) {
-                setAuthError('Invalid email or password. Please check your credentials and try again.')
-                return
-            }
-            
+        onSuccess: () => {
             navigate({ to: '/' })
         },
         onError: (error: any) => {
             console.error('Sign-in error:', error)
-            
-            // Extract error message from Better Auth error response
-            let errorMessage = 'An error occurred during sign in. Please try again.'
-            
-            if (error?.message) {
-                errorMessage = error.message
-            } else if (error?.status === 401) {
-                errorMessage = 'Invalid email or password. Please check your credentials and try again.'
-            } else if (error?.status === 422) {
-                errorMessage = 'Invalid email or password. Please check your credentials and try again.'
-            }
-            
+
+            const errorMessage =
+                (error instanceof Error && error.message) ||
+                error?.message ||
+                DEFAULT_SIGNIN_ERROR
+
             setAuthError(errorMessage)
         },
     })
@@ -88,7 +106,26 @@ export const SignIn = () => {
         setAuthError(null)
         
         if (validateForm()) {
-            signInMutation.mutate({ email: formData.email, password: formData.password })
+            const payload = { email: formData.email, password: formData.password }
+            const mutationPromise = signInMutation.mutateAsync(payload)
+
+            toastManager.promise(mutationPromise, {
+                loading: {
+                    title: 'Signing In...',
+                    description: 'Authenticating your credentials...',
+                    timeout: 0,
+                },
+                success: {
+                    title: 'Signed In',
+                    description: 'Welcome back! Redirecting to dashboard...',
+                },
+                error: (error) => ({
+                    title: 'Sign In Failed',
+                    description:
+                        (error instanceof Error && error.message) ||
+                        DEFAULT_SIGNIN_ERROR,
+                }),
+            })
         }
     }
 
@@ -100,8 +137,9 @@ export const SignIn = () => {
             <CardPanel>
                 <Form onSubmit={handleSubmit} className="space-y-4">
                     <Field>
-                        <FieldLabel>Email</FieldLabel>
+                        <FieldLabel htmlFor={fieldIds.email}>Email</FieldLabel>
                         <FieldControl
+                            id={fieldIds.email}
                             type="email"
                             placeholder="Enter your email"
                             value={formData.email}
@@ -109,13 +147,17 @@ export const SignIn = () => {
                             onBlur={handleInputBlur("email")}
                             required
                             aria-invalid={!!errors.email}
+                            aria-describedby={errors.email ? errorIds.email : undefined}
                         />
-                        {errors.email && <FieldError>{errors.email}</FieldError>}
+                        {errors.email && (
+                            <FieldError id={errorIds.email}>{errors.email}</FieldError>
+                        )}
                     </Field>
                     
                     <Field>
-                        <FieldLabel>Password</FieldLabel>
+                        <FieldLabel htmlFor={fieldIds.password}>Password</FieldLabel>
                         <FieldControl
+                            id={fieldIds.password}
                             type="password"
                             placeholder="Enter your password"
                             value={formData.password}
@@ -123,8 +165,11 @@ export const SignIn = () => {
                             onBlur={handleInputBlur("password")}
                             required
                             aria-invalid={!!errors.password}
+                            aria-describedby={errors.password ? errorIds.password : undefined}
                         />
-                        {errors.password && <FieldError>{errors.password}</FieldError>}
+                        {errors.password && (
+                            <FieldError id={errorIds.password}>{errors.password}</FieldError>
+                        )}
                     </Field>
                     
                     {authError && (
