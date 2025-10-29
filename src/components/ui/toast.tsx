@@ -164,4 +164,46 @@ function ToastList({ position = "bottom-right" }: { position: ToastPosition }) {
   )
 }
 
-export { ToastProvider, type ToastPosition, toastManager }
+// Toast function to create and show toasts
+function toast({
+  title,
+  description,
+  type = "info",
+  duration = 5000,
+  actionProps,
+}: {
+  title: string
+  description?: string
+  type?: "loading" | "success" | "error" | "info" | "warning"
+  duration?: number
+  actionProps?: { children: React.ReactNode; onClick?: () => void }
+}) {
+  // Create a simple promise that resolves immediately for instant toasts
+  const promise = new Promise<void>((resolve) => {
+    setTimeout(() => resolve(), 50) // Very small delay to show loading state briefly
+  })
+
+  return toastManager.promise(promise, {
+    loading: {
+      title,
+      description,
+      type: type === "loading" ? "loading" : "info",
+    },
+    success: () => ({
+      title,
+      description,
+      type: type === "loading" ? "success" : type,
+      duration,
+      actionProps,
+    }),
+    error: () => ({
+      title,
+      description,
+      type: type === "loading" ? "error" : type,
+      duration,
+      actionProps,
+    }),
+  })
+}
+
+export { ToastProvider, type ToastPosition, toastManager, toast }

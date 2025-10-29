@@ -10,6 +10,11 @@ export const auth = betterAuth({
         provider: "pg",
     }),
     
+    trustedOrigins: [
+        "http://localhost:3000",
+        "http://localhost:3001",
+    ],
+    
     emailAndPassword: { 
         enabled: true,
     },

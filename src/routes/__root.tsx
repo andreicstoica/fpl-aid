@@ -8,6 +8,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import { ToastProvider } from '../components/ui/toast'
+import { Header } from '../components/Header'
 
 import appCss from '../styles.css?url'
 
@@ -51,6 +52,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ToastProvider>
+          <Header />
           <div className="mx-auto max-w-7xl">
             {children}
           </div>

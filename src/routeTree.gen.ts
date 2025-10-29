@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiUserSettingsRouteImport } from './routes/api/user-settings'
+import { Route as ApiUpdateUserSettingsRouteImport } from './routes/api/update-user-settings'
 import { Route as ApiSignupRouteImport } from './routes/api/signup'
 import { Route as ApiFplRosterRouteImport } from './routes/api/fpl-roster'
 import { Route as ApiFplDashboardRouteImport } from './routes/api/fpl-dashboard'
@@ -30,6 +32,16 @@ const SignInRoute = SignInRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUserSettingsRoute = ApiUserSettingsRouteImport.update({
+  id: '/api/user-settings',
+  path: '/api/user-settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUpdateUserSettingsRoute = ApiUpdateUserSettingsRouteImport.update({
+  id: '/api/update-user-settings',
+  path: '/api/update-user-settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSignupRoute = ApiSignupRouteImport.update({
@@ -60,6 +72,8 @@ export interface FileRoutesByFullPath {
   '/api/fpl-dashboard': typeof ApiFplDashboardRoute
   '/api/fpl-roster': typeof ApiFplRosterRoute
   '/api/signup': typeof ApiSignupRoute
+  '/api/update-user-settings': typeof ApiUpdateUserSettingsRoute
+  '/api/user-settings': typeof ApiUserSettingsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +83,8 @@ export interface FileRoutesByTo {
   '/api/fpl-dashboard': typeof ApiFplDashboardRoute
   '/api/fpl-roster': typeof ApiFplRosterRoute
   '/api/signup': typeof ApiSignupRoute
+  '/api/update-user-settings': typeof ApiUpdateUserSettingsRoute
+  '/api/user-settings': typeof ApiUserSettingsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
@@ -79,6 +95,8 @@ export interface FileRoutesById {
   '/api/fpl-dashboard': typeof ApiFplDashboardRoute
   '/api/fpl-roster': typeof ApiFplRosterRoute
   '/api/signup': typeof ApiSignupRoute
+  '/api/update-user-settings': typeof ApiUpdateUserSettingsRoute
+  '/api/user-settings': typeof ApiUserSettingsRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +108,8 @@ export interface FileRouteTypes {
     | '/api/fpl-dashboard'
     | '/api/fpl-roster'
     | '/api/signup'
+    | '/api/update-user-settings'
+    | '/api/user-settings'
     | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +119,8 @@ export interface FileRouteTypes {
     | '/api/fpl-dashboard'
     | '/api/fpl-roster'
     | '/api/signup'
+    | '/api/update-user-settings'
+    | '/api/user-settings'
     | '/api/auth/$'
   id:
     | '__root__'
@@ -108,6 +130,8 @@ export interface FileRouteTypes {
     | '/api/fpl-dashboard'
     | '/api/fpl-roster'
     | '/api/signup'
+    | '/api/update-user-settings'
+    | '/api/user-settings'
     | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +142,8 @@ export interface RootRouteChildren {
   ApiFplDashboardRoute: typeof ApiFplDashboardRoute
   ApiFplRosterRoute: typeof ApiFplRosterRoute
   ApiSignupRoute: typeof ApiSignupRoute
+  ApiUpdateUserSettingsRoute: typeof ApiUpdateUserSettingsRoute
+  ApiUserSettingsRoute: typeof ApiUserSettingsRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -142,6 +168,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/user-settings': {
+      id: '/api/user-settings'
+      path: '/api/user-settings'
+      fullPath: '/api/user-settings'
+      preLoaderRoute: typeof ApiUserSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/update-user-settings': {
+      id: '/api/update-user-settings'
+      path: '/api/update-user-settings'
+      fullPath: '/api/update-user-settings'
+      preLoaderRoute: typeof ApiUpdateUserSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/signup': {
@@ -182,6 +222,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiFplDashboardRoute: ApiFplDashboardRoute,
   ApiFplRosterRoute: ApiFplRosterRoute,
   ApiSignupRoute: ApiSignupRoute,
+  ApiUpdateUserSettingsRoute: ApiUpdateUserSettingsRoute,
+  ApiUserSettingsRoute: ApiUserSettingsRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
