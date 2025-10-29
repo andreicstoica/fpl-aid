@@ -1,5 +1,5 @@
 import { pgTable, text, timestamp, boolean, jsonb } from 'drizzle-orm/pg-core'
-import type { FplRosterPlayer } from '@/types/fpl'
+import type { FplRosterPlayer, FplDashboardData } from '@/types/fpl'
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -59,6 +59,8 @@ export const userTeamData = pgTable("user_team_data", {
   favoriteTeam: text("favorite_team").notNull(),
   rosterCache: jsonb("roster_cache").$type<FplRosterPlayer[] | null>().default(null),
   rosterCacheUpdatedAt: timestamp("roster_cache_updated_at"),
+  dashboardCache: jsonb("dashboard_cache").$type<FplDashboardData | null>().default(null),
+  dashboardCacheUpdatedAt: timestamp("dashboard_cache_updated_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .$onUpdate(() => /* @__PURE__ */ new Date())

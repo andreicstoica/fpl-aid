@@ -118,3 +118,29 @@ export interface FplRosterPlayer {
 	isViceCaptain: boolean;
 	multiplier: number;
 }
+
+// Dashboard Types
+export interface FplManagerStats {
+	totalPoints: number;
+	currentGameweek: number;
+	transfersRemaining: number;
+	bankBalance: number;
+	squadValue: number;
+}
+
+export interface LeagueComparison {
+	userRank: number;
+	rivalAbove: {
+		name: string;
+		points: number;
+		avgPointsPerWeek: number;
+	};
+	pointsGap: number;
+	userAvgPointsPerWeek: number;
+}
+
+export interface FplDashboardData {
+	roster: FplRosterPlayer[];
+	manager: FplManagerStats;
+	league: LeagueComparison;
+}
