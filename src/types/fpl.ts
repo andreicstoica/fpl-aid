@@ -77,3 +77,44 @@ export interface LeagueDifferentialsData {
 	differentials: DifferentialPick[];
 	userTotalPoints: number;
 }
+
+// FPL API Response Types
+export interface FplBootstrapPlayer {
+	id: number;
+	first_name: string;
+	second_name: string;
+	web_name: string;
+	element_type: number; // 1=GKP, 2=DEF, 3=MID, 4=FWD
+	team: number;
+	now_cost: number; // price in 0.1 units (e.g., 100 = £10.0m)
+	total_points: number;
+	form: string;
+	points_per_game: string;
+	expected_points: string;
+	news: string;
+	news_added?: string;
+	status: string;
+}
+
+export interface FplTeamPick {
+	element: number; // player ID
+	position: number; // 1-15 (starting 11 + 4 subs)
+	is_captain: boolean;
+	is_vice_captain: boolean;
+	multiplier: number;
+}
+
+export interface FplRosterPlayer {
+	id: number;
+	name: string;
+	team: string;
+	position: "GKP" | "DEF" | "MID" | "FWD";
+	price: number;
+	totalPoints: number;
+	form: number;
+	pointsPerGame: number;
+	expectedPoints: number;
+	isCaptain: boolean;
+	isViceCaptain: boolean;
+	multiplier: number;
+}

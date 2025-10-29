@@ -13,6 +13,7 @@ import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSignupRouteImport } from './routes/api/signup'
+import { Route as ApiFplRosterRouteImport } from './routes/api/fpl-roster'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const SignUpRoute = SignUpRouteImport.update({
@@ -35,6 +36,11 @@ const ApiSignupRoute = ApiSignupRouteImport.update({
   path: '/api/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiFplRosterRoute = ApiFplRosterRouteImport.update({
+  id: '/api/fpl-roster',
+  path: '/api/fpl-roster',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/api/fpl-roster': typeof ApiFplRosterRoute
   '/api/signup': typeof ApiSignupRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/api/fpl-roster': typeof ApiFplRosterRoute
   '/api/signup': typeof ApiSignupRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
@@ -60,21 +68,42 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/api/fpl-roster': typeof ApiFplRosterRoute
   '/api/signup': typeof ApiSignupRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in' | '/sign-up' | '/api/signup' | '/api/auth/$'
+  fullPaths:
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/api/fpl-roster'
+    | '/api/signup'
+    | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sign-in' | '/sign-up' | '/api/signup' | '/api/auth/$'
-  id: '__root__' | '/' | '/sign-in' | '/sign-up' | '/api/signup' | '/api/auth/$'
+  to:
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/api/fpl-roster'
+    | '/api/signup'
+    | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/sign-in'
+    | '/sign-up'
+    | '/api/fpl-roster'
+    | '/api/signup'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  ApiFplRosterRoute: typeof ApiFplRosterRoute
   ApiSignupRoute: typeof ApiSignupRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -109,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/fpl-roster': {
+      id: '/api/fpl-roster'
+      path: '/api/fpl-roster'
+      fullPath: '/api/fpl-roster'
+      preLoaderRoute: typeof ApiFplRosterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -123,6 +159,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  ApiFplRosterRoute: ApiFplRosterRoute,
   ApiSignupRoute: ApiSignupRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
