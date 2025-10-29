@@ -193,14 +193,14 @@ function toast({
       title,
       description,
       type: type === "loading" ? "success" : type,
-      duration,
+      timeout: duration,
       actionProps,
     }),
     error: () => ({
       title,
       description,
       type: type === "loading" ? "error" : type,
-      duration,
+      timeout: duration,
       actionProps,
     }),
   })

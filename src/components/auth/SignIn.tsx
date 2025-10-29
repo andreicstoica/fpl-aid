@@ -113,7 +113,6 @@ export const SignIn = () => {
                 loading: {
                     title: 'Signing In...',
                     description: 'Authenticating your credentials...',
-                    timeout: 0,
                 },
                 success: {
                     title: 'Signed In',

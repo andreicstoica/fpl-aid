@@ -132,7 +132,6 @@ export const SignUp = () => {
                 loading: {
                     title: 'Creating Account...',
                     description: 'Validating FPL data and creating your account...',
-                    timeout: 0,
                 },
                 success: () => ({
                     title: 'Account Created!',
