@@ -3,13 +3,14 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/index";
 import { userTeamData } from "@/db/schema";
 import type {
-	FplBootstrapPlayer,
-	FplDashboardData,
-	FplManagerStats,
-	FplRosterPlayer,
-	FplTeamPick,
-	LeagueComparison,
+    FplBootstrapPlayer,
+    FplDashboardData,
+    FplManagerStats,
+    FplRosterPlayer,
+    FplTeamPick,
+    LeagueComparison,
 } from "@/types/fpl";
+import { computeRecommendations } from "@/lib/fpl/recommendations";
 import { PREMIER_LEAGUE_TEAMS } from "@/types/teams";
 import { auth } from "@/utils/auth";
 import { getUserFplData } from "@/utils/user-fpl";
@@ -177,6 +178,8 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 							isCaptain: pick.is_captain,
 							isViceCaptain: pick.is_vice_captain,
 							multiplier: pick.multiplier,
+							status: player.status,
+							news: player.news,
 						};
 					});
 
@@ -244,21 +247,36 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						}
 					}
 
-					const dashboardData: FplDashboardData = {
-						roster,
-						manager,
-						league: league || {
-							userRank: 0,
-							rivalAbove: {
-								name: "Unknown",
-								points: 0,
-								avgPointsPerWeek: 0,
-							},
-							pointsGap: 0,
-							ppwGap: 0,
-							userAvgPointsPerWeek: 0,
-						},
-					};
+                    // Build simplified allPlayers for recommendation engine
+                    const allPlayers = (players || []).map((e) => ({
+                        id: e.id,
+                        name: e.web_name,
+                        team: getTeamName(e.team),
+                        position: getPositionName(e.element_type),
+                        price: convertPrice(e.now_cost),
+                        form: parseFloat(e.form || "0") || 0,
+                        pointsPerGame: parseFloat(e.points_per_game || "0") || 0,
+                        expectedPoints: parseFloat(e.expected_points || "0") || 0,
+                    }));
+
+                    const recs = computeRecommendations(roster, allPlayers);
+
+                    const dashboardData: FplDashboardData = {
+                        roster,
+                        manager,
+                        league: league || {
+                            userRank: 0,
+                            rivalAbove: {
+                                name: "Unknown",
+                                points: 0,
+                                avgPointsPerWeek: 0,
+                            },
+                            pointsGap: 0,
+                            ppwGap: 0,
+                            userAvgPointsPerWeek: 0,
+                        },
+                        recommendations: recs.items,
+                    };
 
 					// Cache the dashboard data
 					await db

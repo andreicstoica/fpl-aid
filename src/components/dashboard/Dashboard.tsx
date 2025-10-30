@@ -7,29 +7,28 @@ import {
 	EmptyTitle,
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { FplDashboardData } from "@/types/fpl";
 import { LeagueStats } from "./LeagueStats";
 import { ManagerStats } from "./ManagerStats";
 import { SoccerField } from "./SoccerField";
+import { Recommendations } from "./Recommendations";
 
 export function Dashboard() {
 	const {
 		data: dashboardData,
-		isLoading,
-		error,
-	} = useQuery<FplDashboardData>({
+		isLoading: dashboardLoading,
+		error: dashboardError,
+	} = useQuery({
 		queryKey: ["fpl-dashboard"],
 		queryFn: async () => {
 			const response = await fetch("/api/fpl-dashboard");
-			if (!response.ok) {
-				throw new Error("Failed to fetch dashboard data");
-			}
+			if (!response.ok) throw new Error("Failed to fetch dashboard data");
 			return response.json();
 		},
 		retry: false,
 	});
 
-	if (isLoading) {
+
+	if (dashboardLoading) {
 		return (
 			<div className="min-h-screen flex items-center justify-center py-8">
 				<div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
@@ -43,20 +42,18 @@ export function Dashboard() {
 			</div>
 		);
 	}
-
-	if (error) {
+	if (dashboardError) {
 		return (
 			<div className="min-h-screen flex items-center justify-center py-8">
 				<div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
 					<Alert variant="error" className="max-w-2xl mx-auto">
 						<AlertTitle>Error loading dashboard</AlertTitle>
-						<AlertDescription>{(error as Error).message}</AlertDescription>
+						<AlertDescription>{(dashboardError as Error).message}</AlertDescription>
 					</Alert>
 				</div>
 			</div>
 		);
 	}
-
 	if (!dashboardData) {
 		return (
 			<div className="min-h-screen flex items-center justify-center py-8">
@@ -75,7 +72,6 @@ export function Dashboard() {
 	}
 
 	const { roster, manager, league } = dashboardData;
-
 	return (
 		<div className="min-h-screen py-8 sm:py-10">
 			<div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -84,7 +80,8 @@ export function Dashboard() {
 					{manager && <ManagerStats manager={manager} />}
 					{league && <LeagueStats league={league} />}
 				</div>
-
+			{/* Recommendations under stats */}
+			<Recommendations items={dashboardData.recommendations || null} />
 				{/* Soccer Field */}
 				<SoccerField roster={roster} />
 			</div>

@@ -1,4 +1,4 @@
-import { boolean, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, text, timestamp, index, unique } from "drizzle-orm/pg-core";
 import type { FplDashboardData, FplRosterPlayer } from "@/types/fpl";
 
 export const user = pgTable("user", {
@@ -82,3 +82,33 @@ export const verification = pgTable("verification", {
 		.$onUpdate(() => /* @__PURE__ */ new Date())
 		.notNull(),
 });
+
+// Cache of differential recommendations computed server-side
+export const recommendationsCache = pgTable(
+	"recommendations_cache",
+	{
+		id: text("id").primaryKey().default(crypto.randomUUID()),
+		userId: text("user_id").notNull(),
+		leagueId: text("league_id"),
+		gameweek: integer("gameweek").notNull(),
+		contextHash: text("context_hash").notNull(),
+		payload: jsonb("payload").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		expiresAt: timestamp("expires_at").notNull(),
+	},
+	(table) => {
+		return {
+			userIdx: index("recommendations_cache_user_idx").on(table.userId),
+			leagueIdx: index("recommendations_cache_league_idx").on(table.leagueId),
+			gwIdx: index("recommendations_cache_gw_idx").on(table.gameweek),
+			ctxIdx: index("recommendations_cache_ctx_idx").on(table.contextHash),
+			expIdx: index("recommendations_cache_expires_idx").on(table.expiresAt),
+			uniq: unique("recommendations_cache_unique").on(
+				table.userId,
+				table.leagueId,
+				table.gameweek,
+				table.contextHash,
+			),
+		};
+	},
+);
