@@ -1,12 +1,10 @@
-import { DollarSign, Shield, Star, Target, TrendingUp, AlertTriangle, Ban, TrendingDown, Hospital, Flag } from "lucide-react";
+import { Shield, Star, TrendingDown, Hospital, Flag, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { FplRosterPlayer } from "@/types/fpl";
 import { getTeamColors } from "@/types/teams";
-import {
-  isFormPlummeting,
-} from "@/utils/player-performance";
+import { isFormPlummeting } from "@/utils/player-performance";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface PlayerCardProps {
@@ -88,17 +86,14 @@ export function PlayerCard({ player }: PlayerCardProps) {
 		{
 			label: "Price",
 			value: `£${player.price.toFixed(1)}m`,
-			icon: <DollarSign className="h-2.5 w-2.5 text-emerald-600" />,
 		},
 		{
 			label: "Form",
 			value: player.form.toFixed(1),
-			icon: <TrendingUp className="h-2.5 w-2.5 text-emerald-600" />,
 		},
 		{
 			label: "PPG",
 			value: player.pointsPerGame.toFixed(1),
-			icon: <Target className="h-2.5 w-2.5 text-emerald-600" />,
 		},
 	] as const;
 
@@ -107,27 +102,48 @@ export function PlayerCard({ player }: PlayerCardProps) {
 	const news = player.news;
 	const showInjury = status === "i";
 	const showSuspended = status === "s";
+	const showDoubtful = status === "d";
 	const showFormTank = isFormPlummeting(player);
+
+	// Extract doubt percentage from news if present (e.g., "75% chance of playing")
+	const doubtfulPercent = showDoubtful
+		? (() => {
+			const match = news?.match(/(\d{1,3})%/);
+			const num = match ? Number(match[1]) : undefined;
+			return Number.isFinite(num) ? Math.max(0, Math.min(100, num as number)) : undefined;
+		})()
+		: undefined;
 	const availabilityBorder =
 		(showInjury || showSuspended || player.chanceOfPlayingNextRound === 25 || player.chanceOfPlayingNextRound === 0)
 			? "border-red-400 border-2"
-			: player.chanceOfPlayingNextRound === 50
+			: (player.chanceOfPlayingNextRound === 50 || player.chanceOfPlayingNextRound === 75)
 				? "border-yellow-400 border-2"
 				: "border-white/40";
 
 	return (
 		<div className="relative w-full sm:w-52 md:w-56 lg:w-60">
-			{(showInjury || showSuspended || showFormTank) && (
+		{(showInjury || showSuspended || showDoubtful || showFormTank) && (
 				<TooltipProvider>
 					<div className="absolute right-3 top-3 z-20 space-y-2 flex flex-col items-end">
 						{showInjury && (
 							<Tooltip>
 								<TooltipTrigger>
-									<Badge variant="warning" size="sm" className="flex items-center gap-1 shadow-sm cursor-help bg-amber-100 border-amber-400 text-black">
+									<Badge variant="destructive" size="sm" className="flex items-center gap-1 shadow-sm cursor-help bg-amber-100 border-amber-400 text-black">
 										<Hospital className="h-3 w-3" />
 									</Badge>
 								</TooltipTrigger>
 								<TooltipContent className="px-3 py-2 text-xs font-semibold rounded-lg bg-amber-50 text-black shadow border border-amber-300">{news || "Injury"}</TooltipContent>
+							</Tooltip>
+						)}
+						{showDoubtful && (
+							<Tooltip>
+								<TooltipTrigger>
+									<Badge variant="destructive" size="sm" className="flex items-center gap-1 shadow-sm cursor-help bg-amber-100 border-amber-400 text-black">
+										<AlertTriangle className="h-3 w-3" />
+										{typeof doubtfulPercent === "number" ? `${doubtfulPercent}%` : "Doubt"}
+									</Badge>
+								</TooltipTrigger>
+								<TooltipContent className="px-3 py-2 text-xs font-semibold rounded-lg bg-amber-50 text-black shadow border border-amber-300">{news || "Doubtful"}</TooltipContent>
 							</Tooltip>
 						)}
 						{showSuspended && (
@@ -206,7 +222,6 @@ export function PlayerCard({ player }: PlayerCardProps) {
 							)}
 						>
 							<div className="flex items-center gap-0.5 text-[0.6rem] uppercase tracking-widest text-emerald-700 whitespace-nowrap sm:text-[0.65rem]">
-								{stat.icon}
 								<span className="truncate">{stat.label}</span>
 							</div>
 							<div className="w-full truncate text-xs font-semibold text-slate-900 sm:text-sm">

@@ -148,4 +148,10 @@ export interface FplDashboardData {
 	roster: FplRosterPlayer[];
 	manager: FplManagerStats;
 	league: LeagueComparison;
+    recommendations?: Array<{
+        in: FplRosterPlayer;
+        out: FplRosterPlayer;
+        score: number;
+        rationale: string;
+    }>;
 }
