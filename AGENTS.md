@@ -36,6 +36,64 @@
 - Pull requests should summarize scope, list testing done (commands and environments), link relevant issues, and attach screenshots or recordings for UI-facing updates.  
 - Mention required env variables (e.g., `DATABASE_URL` in `.env.local`) and migration steps whenever the change impacts deployment.
 
+## Environment & Secrets
+
+- `DATABASE_URL` powers Drizzle on the server (`src/db/index.ts`); sync it with your local Postgres or Neon instance.  
+- `VITE_DATABASE_URL` is required by the Neon Vite plugin (`neon-vite-plugin.ts`) for browser/serverless queries during dev.  
+- `ORIGIN`, `CLIENT_ORIGIN`, and `TRUSTED_ORIGINS` extend the Better Auth trusted origin list (`src/utils/auth.ts`).  
+- Cron/webhook envs (`ALERT_*`) are documented in `email-cron-integration.md`; keep secrets out of the repo and surface required vars in PRs.
+
+## Application Architecture Highlights
+
+- Router setup lives in `src/router.tsx`; it injects a shared TanStack Query client via `src/integrations/tanstack-query/root-provider.tsx` and wires SSR prefetch with `setupRouterSsrQueryIntegration`.  
+- `src/routes/__root.tsx` renders the shell (header, toast provider, devtools) and defines the `<html>` document.  
+- The `/` route loader (`src/routes/index.tsx`) runs on the server, pulling session info, FPL dashboard data, bootstrap data, and recommendation cache before rendering.  
+- Client components use React Query for API data (`Dashboard` uses `queryKey: ["fpl-dashboard"]`), so cache invalidation happens through React Query rather than manual fetches.
+
+## Auth & Sessions
+
+- Authentication flows through Better Auth with the Drizzle adapter (`src/utils/auth.ts`); `customSession` hydrates the session with FPL IDs from `user_team_data`.  
+- `src/routes/api/auth/$.ts` proxies requests to Better Auth; React components call `authClient` (`src/utils/auth-client.ts`).  
+- Sign-in/up forms live in `src/components/auth/`; they use React Query mutations plus shared form validation helpers in `src/utils/form-utils.ts`.
+
+## API Surface & Caching
+
+- `src/routes/api/fpl-dashboard.ts` orchestrates FPL fetches, computes league comparisons, attaches recommendations, and caches payloads in `userTeamData.dashboardCache` for five minutes.  
+- `src/routes/api/fpl-roster.ts` returns the current squad and caches it separately (`rosterCache`, also five minutes).  
+- `src/routes/api/user-settings.ts` and `update-user-settings.ts` fetch/update FPL IDs; updates clear both dashboard and roster caches to force fresh data.  
+- `src/routes/index.tsx` loader caches recommendation payloads via `src/lib/fpl/cache.ts`, using a SHA-256 context hash keyed by user/gameweek and a six-hour TTL (`RECOMMENDATIONS_TTL_MS`).
+
+## Recommendation Engine
+
+- Core logic is in `src/lib/fpl/recommendations.ts`; it builds a candidate pool, evaluates players with weighted metrics, and returns top differentials.  
+- Metric modules live under `src/lib/fpl/metrics/` (expected points delta, form delta/trend, fixture ease, value signal) with Vitest coverage alongside each file.  
+- `src/lib/fpl/config.ts` controls weights (`metricWeights`), recommendation count, and TTL; bump `WEIGHTS_VERSION` to invalidate cache after major tuning.  
+- Caching helpers (`computeContextHash`, `readRecommendationsCache`, `writeRecommendationsCache`) store JSON payloads in the `recommendations_cache` table (`src/lib/fpl/cache.ts`).  
+- Tests for adapters/cache live in `src/lib/fpl/*.test.ts`; update them when adjusting scoring, selection heuristics, or cache shape.
+
+## Dashboard & UI
+
+- `src/components/dashboard/Dashboard.tsx` renders manager stats, league comparison, recommendations, and the pitch view (`SoccerField`).  
+- `src/components/dashboard/Recommendations.tsx` formats the recommendation list and handles empty states.  
+- `src/components/SettingsSheet.tsx` exposes FPL Team/League ID inputs, triggers cache invalidation through React Query, and provides logout.  
+- Toasts are powered by `src/components/ui/toast`; keep messages short and user-focused.
+
+## Database Footprint
+
+- Auth tables (`user`, `session`, `account`, `verification`) are defined in both `auth-schema.ts` and `src/db/schema.ts`; keep them aligned with Better Auth expectations.  
+- `user_team_data` stores FPL identifiers plus cached dashboard/roster blobs and timestamps.  
+- `recommendations_cache` persists per-user differential payloads; Drizzle schema enforces a composite uniqueness constraint on `(user_id, league_id, gameweek, context_hash)`.  
+- Run `bun run db:generate` after schema edits and commit the generated SQL in `drizzle/`; `db:migrate` applies migrations locally.
+
+## Email Deadline Alerts
+
+- `email-cron-integration.md` documents how the Val Town cron notifies this app. Build webhook handlers under `src/routes/api/webhooks.*` if you need to process alerts; verify signatures when `ALERT_WEBHOOK_SIGNING_SECRET` is set.
+
+## Testing Notes
+
+- Unit tests currently focus on the recommendation engine (`src/lib/fpl/**.test.ts`); extend coverage when altering recommendation weights or adapters.  
+- Use `bun run test` for Vitest, `bun run lint`, and `bun run check` before finishing tasks; add targeted tests for new API handlers or utilities.
+
 ## Info Flow
 
 ```mermaid
@@ -82,6 +140,57 @@ sequenceDiagram
       Index-->>U: Rec list + <Dashboard />
     else guest
       Index-->>U: <SignIn />
+    end
+  end
+```
+
+## Email Alerts Flow
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant VT as Val Town Cron
+  participant AlertAPI as /api/alerts/fpl-ready
+  participant DB as Drizzle_DB
+  participant FPL as FPL_APIs
+  participant Risk as Player Risk Logic
+  participant User as Users
+
+  loop Every 12 hours
+    VT->>AlertAPI: GET /api/alerts/fpl-ready<br/>(x-alert-secret header)
+    AlertAPI->>AlertAPI: Validate secret auth
+    
+    AlertAPI->>FPL: GET bootstrap-static
+    FPL-->>AlertAPI: current gameweek + deadline
+    
+    AlertAPI->>DB: Load users with FPL data
+    DB-->>AlertAPI: users (id, email, fplTeamId)
+    
+    loop For each user
+      AlertAPI->>FPL: GET entry/{teamId}/event/{gw}/picks
+      FPL-->>AlertAPI: squad picks + player data
+      
+      AlertAPI->>Risk: assessPlayerRisk(player)
+      Risk-->>AlertAPI: badge + news (injured/suspended/doubtful/form_dip)
+      
+      alt player has risk
+        AlertAPI->>AlertAPI: Include in recipients
+      else player is ok
+        AlertAPI->>AlertAPI: Skip
+      end
+    end
+    
+    AlertAPI-->>VT: { gameweek, deadlineUtc, recipients[] }
+    
+    loop For each recipient
+      VT->>VT: Check dedupe (userId:gameweek)
+      alt already sent
+        VT->>VT: Skip
+      else not sent
+        VT->>VT: Render HTML email with player risks
+        VT->>User: Send email via VT email()
+        VT->>VT: Store dedupe state
+      end
     end
   end
 ```

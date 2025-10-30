@@ -17,7 +17,9 @@ import { Route as ApiUpdateUserSettingsRouteImport } from './routes/api/update-u
 import { Route as ApiSignupRouteImport } from './routes/api/signup'
 import { Route as ApiFplRosterRouteImport } from './routes/api/fpl-roster'
 import { Route as ApiFplDashboardRouteImport } from './routes/api/fpl-dashboard'
+import { Route as ApiWebhooksFplDeadlineRouteImport } from './routes/api/webhooks/fpl-deadline'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiAlertsFplReadyRouteImport } from './routes/api/alerts/fpl-ready'
 
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
@@ -59,9 +61,19 @@ const ApiFplDashboardRoute = ApiFplDashboardRouteImport.update({
   path: '/api/fpl-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhooksFplDeadlineRoute = ApiWebhooksFplDeadlineRouteImport.update({
+  id: '/api/webhooks/fpl-deadline',
+  path: '/api/webhooks/fpl-deadline',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAlertsFplReadyRoute = ApiAlertsFplReadyRouteImport.update({
+  id: '/api/alerts/fpl-ready',
+  path: '/api/alerts/fpl-ready',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -74,7 +86,9 @@ export interface FileRoutesByFullPath {
   '/api/signup': typeof ApiSignupRoute
   '/api/update-user-settings': typeof ApiUpdateUserSettingsRoute
   '/api/user-settings': typeof ApiUserSettingsRoute
+  '/api/alerts/fpl-ready': typeof ApiAlertsFplReadyRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/webhooks/fpl-deadline': typeof ApiWebhooksFplDeadlineRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -85,7 +99,9 @@ export interface FileRoutesByTo {
   '/api/signup': typeof ApiSignupRoute
   '/api/update-user-settings': typeof ApiUpdateUserSettingsRoute
   '/api/user-settings': typeof ApiUserSettingsRoute
+  '/api/alerts/fpl-ready': typeof ApiAlertsFplReadyRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/webhooks/fpl-deadline': typeof ApiWebhooksFplDeadlineRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -97,7 +113,9 @@ export interface FileRoutesById {
   '/api/signup': typeof ApiSignupRoute
   '/api/update-user-settings': typeof ApiUpdateUserSettingsRoute
   '/api/user-settings': typeof ApiUserSettingsRoute
+  '/api/alerts/fpl-ready': typeof ApiAlertsFplReadyRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/webhooks/fpl-deadline': typeof ApiWebhooksFplDeadlineRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -110,7 +128,9 @@ export interface FileRouteTypes {
     | '/api/signup'
     | '/api/update-user-settings'
     | '/api/user-settings'
+    | '/api/alerts/fpl-ready'
     | '/api/auth/$'
+    | '/api/webhooks/fpl-deadline'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -121,7 +141,9 @@ export interface FileRouteTypes {
     | '/api/signup'
     | '/api/update-user-settings'
     | '/api/user-settings'
+    | '/api/alerts/fpl-ready'
     | '/api/auth/$'
+    | '/api/webhooks/fpl-deadline'
   id:
     | '__root__'
     | '/'
@@ -132,7 +154,9 @@ export interface FileRouteTypes {
     | '/api/signup'
     | '/api/update-user-settings'
     | '/api/user-settings'
+    | '/api/alerts/fpl-ready'
     | '/api/auth/$'
+    | '/api/webhooks/fpl-deadline'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -144,7 +168,9 @@ export interface RootRouteChildren {
   ApiSignupRoute: typeof ApiSignupRoute
   ApiUpdateUserSettingsRoute: typeof ApiUpdateUserSettingsRoute
   ApiUserSettingsRoute: typeof ApiUserSettingsRoute
+  ApiAlertsFplReadyRoute: typeof ApiAlertsFplReadyRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiWebhooksFplDeadlineRoute: typeof ApiWebhooksFplDeadlineRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -205,11 +231,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiFplDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhooks/fpl-deadline': {
+      id: '/api/webhooks/fpl-deadline'
+      path: '/api/webhooks/fpl-deadline'
+      fullPath: '/api/webhooks/fpl-deadline'
+      preLoaderRoute: typeof ApiWebhooksFplDeadlineRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/alerts/fpl-ready': {
+      id: '/api/alerts/fpl-ready'
+      path: '/api/alerts/fpl-ready'
+      fullPath: '/api/alerts/fpl-ready'
+      preLoaderRoute: typeof ApiAlertsFplReadyRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -224,7 +264,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSignupRoute: ApiSignupRoute,
   ApiUpdateUserSettingsRoute: ApiUpdateUserSettingsRoute,
   ApiUserSettingsRoute: ApiUserSettingsRoute,
+  ApiAlertsFplReadyRoute: ApiAlertsFplReadyRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiWebhooksFplDeadlineRoute: ApiWebhooksFplDeadlineRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
