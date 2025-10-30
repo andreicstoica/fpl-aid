@@ -44,9 +44,12 @@ export function buildCandidatePool(
 }
 
 export function selectSwapOut(roster: FplRosterPlayer[]): FplRosterPlayer {
-	// naive: choose lowest expectedPoints, tie-break lower form
+	// Choose the lowest season-long output, tie-break on near-term projection then form
 	return roster.reduce((worst, p) => {
 		if (!worst) return p;
+		if (p.pointsPerGame !== worst.pointsPerGame) {
+			return p.pointsPerGame < worst.pointsPerGame ? p : worst;
+		}
 		if (p.expectedPoints !== worst.expectedPoints) {
 			return p.expectedPoints < worst.expectedPoints ? p : worst;
 		}

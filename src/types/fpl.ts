@@ -154,5 +154,9 @@ export interface FplDashboardData {
 		out: FplRosterPlayer;
 		score: number;
 		rationale: string;
+		weeklyPointsDelta: number;
+		nextFixtureExpectedDelta: number;
+		valuePerMillion: number;
+		netSpend: number;
 	}>;
 }
