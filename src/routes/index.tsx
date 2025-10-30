@@ -52,31 +52,36 @@ export const Route = createFileRoute("/")({
 			ep_next?: string;
 			ep_this?: string;
 		};
-		const allPlayers = (bootstrapData?.elements || []).map((e: BootstrapElement) => ({
-			id: e.id,
-			name: e.web_name,
-			team: String(e.team),
-			position: (() => {
-				switch (e.element_type) {
-					case 1:
-						return "GKP" as const;
-					case 2:
-						return "DEF" as const;
-					case 3:
-						return "MID" as const;
-					default:
-						return "FWD" as const;
-				}
-			})(),
-			price: (e.now_cost || 0) / 10,
-			form: parseFloat(e.form || "0") || 0,
-			pointsPerGame: parseFloat(e.points_per_game || "0") || 0,
-			expectedPoints: parseFloat(e.ep_next || e.ep_this || "0") || 0,
-		}));
+		const allPlayers = (bootstrapData?.elements || []).map(
+			(e: BootstrapElement) => ({
+				id: e.id,
+				name: e.web_name,
+				team: String(e.team),
+				position: (() => {
+					switch (e.element_type) {
+						case 1:
+							return "GKP" as const;
+						case 2:
+							return "DEF" as const;
+						case 3:
+							return "MID" as const;
+						default:
+							return "FWD" as const;
+					}
+				})(),
+				price: (e.now_cost || 0) / 10,
+				form: parseFloat(e.form || "0") || 0,
+				pointsPerGame: parseFloat(e.points_per_game || "0") || 0,
+				expectedPoints: parseFloat(e.ep_next || e.ep_this || "0") || 0,
+			}),
+		);
 
 		const context = {
 			w: WEIGHTS_VERSION,
-			roster: roster.map((p: { id: number; price: number }) => ({ id: p.id, price: p.price })),
+			roster: roster.map((p: { id: number; price: number }) => ({
+				id: p.id,
+				price: p.price,
+			})),
 			stamp: new Date().toDateString(),
 		};
 		const contextHash = computeContextHash(context);

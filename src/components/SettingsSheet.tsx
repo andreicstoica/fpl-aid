@@ -167,9 +167,9 @@ export function SettingsSheet({ isOpen, onOpenChange }: SettingsSheetProps) {
 				<div className="flex-1 space-y-6 overflow-y-auto p-4">
 					{/* User Info */}
 					<div className="space-y-2">
-					<Label htmlFor={emailId}>Email</Label>
-					<Input
-						id={emailId}
+						<Label htmlFor={emailId}>Email</Label>
+						<Input
+							id={emailId}
 							value={session?.user?.email || ""}
 							disabled
 							className="bg-muted"
@@ -186,9 +186,9 @@ export function SettingsSheet({ isOpen, onOpenChange }: SettingsSheetProps) {
 						<h3 className="text-lg font-medium">FPL Settings</h3>
 
 						<div className="space-y-2">
-						<Label htmlFor={fplTeamInputId}>FPL Team ID</Label>
-						<Input
-							id={fplTeamInputId}
+							<Label htmlFor={fplTeamInputId}>FPL Team ID</Label>
+							<Input
+								id={fplTeamInputId}
 								value={fplTeamId}
 								onChange={(e) => setFplTeamId(e.target.value)}
 								placeholder="Enter your FPL Team ID"
@@ -196,9 +196,9 @@ export function SettingsSheet({ isOpen, onOpenChange }: SettingsSheetProps) {
 						</div>
 
 						<div className="space-y-2">
-						<Label htmlFor={fplLeagueInputId}>FPL League ID</Label>
-						<Input
-							id={fplLeagueInputId}
+							<Label htmlFor={fplLeagueInputId}>FPL League ID</Label>
+							<Input
+								id={fplLeagueInputId}
 								value={fplLeagueId}
 								onChange={(e) => setFplLeagueId(e.target.value)}
 								placeholder="Enter your FPL League ID"

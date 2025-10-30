@@ -20,7 +20,7 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
 				render={(props, state) => (
 					<span {...props}>
 						{state.indeterminate ? (
-						<svg
+							<svg
 								className="size-3"
 								xmlns="http://www.w3.org/2000/svg"
 								width="24"
@@ -31,13 +31,13 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
 								strokeWidth="3"
 								strokeLinecap="round"
 								strokeLinejoin="round"
-							aria-hidden="true"
-							focusable="false"
+								aria-hidden="true"
+								focusable="false"
 							>
 								<path d="M5.252 12h13.496" />
 							</svg>
 						) : (
-						<svg
+							<svg
 								className="size-3"
 								xmlns="http://www.w3.org/2000/svg"
 								width="24"
@@ -48,8 +48,8 @@ function Checkbox({ className, ...props }: CheckboxPrimitive.Root.Props) {
 								strokeWidth="3"
 								strokeLinecap="round"
 								strokeLinejoin="round"
-							aria-hidden="true"
-							focusable="false"
+								aria-hidden="true"
+								focusable="false"
 							>
 								<path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
 							</svg>
