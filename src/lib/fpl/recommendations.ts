@@ -30,8 +30,8 @@ export function computeRecommendations(
 		>
 	>,
 ): RecommendationsPayload {
-	const pool = buildCandidatePool(roster, allPlayers);
 	const out = selectSwapOut(roster);
+	const pool = buildCandidatePool(roster, allPlayers, out.position);
 
 	const ranked = pool
 		.map((c) => {

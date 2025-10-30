@@ -60,7 +60,7 @@ export const Route = createFileRoute("/")({
 			price: (e.now_cost || 0) / 10,
 			form: parseFloat(e.form || "0") || 0,
 			pointsPerGame: parseFloat(e.points_per_game || "0") || 0,
-			expectedPoints: parseFloat(e.expected_points || "0") || 0,
+			expectedPoints: parseFloat(e.ep_next || e.ep_this || "0") || 0,
 		}));
 
 		const context = {

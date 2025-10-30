@@ -90,7 +90,8 @@ export interface FplBootstrapPlayer {
 	total_points: number;
 	form: string;
 	points_per_game: string;
-	expected_points: string;
+	ep_this: string | null; // expected points this gameweek
+	ep_next: string | null; // expected points next gameweek
 	news: string;
 	news_added?: string;
 	status: string;

@@ -174,7 +174,8 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 							totalPoints: player.total_points,
 							form: parseFloat(player.form) || 0,
 							pointsPerGame: parseFloat(player.points_per_game) || 0,
-							expectedPoints: parseFloat(player.expected_points) || 0,
+							expectedPoints:
+								parseFloat(player.ep_next || player.ep_this || "0") || 0,
 							isCaptain: pick.is_captain,
 							isViceCaptain: pick.is_vice_captain,
 							multiplier: pick.multiplier,

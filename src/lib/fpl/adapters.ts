@@ -29,10 +29,18 @@ export function buildCandidatePool(
 			| "expectedPoints"
 		>
 	>,
+	targetPosition?: "GKP" | "DEF" | "MID" | "FWD",
 ): Candidate[] {
-	// For v1.1 keep it simple: evaluate all non-owned players as potential INs
+	// Evaluate all non-owned players as potential INs
 	const ownedIds = new Set(roster.map((p) => p.id));
-	return allPlayers.filter((p) => !ownedIds.has(p.id)).map((p) => ({ ...p }));
+	let candidates = allPlayers.filter((p) => !ownedIds.has(p.id));
+
+	// Filter by position if specified
+	if (targetPosition) {
+		candidates = candidates.filter((p) => p.position === targetPosition);
+	}
+
+	return candidates.map((p) => ({ ...p }));
 }
 
 export function selectSwapOut(roster: FplRosterPlayer[]): FplRosterPlayer {
