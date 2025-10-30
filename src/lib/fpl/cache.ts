@@ -19,19 +19,20 @@ export async function readRecommendationsCache(key: CacheKey) {
 	const rows = await db
 		.select()
 		.from(recommendationsCache)
-    .where(
-        and(
-            eq(recommendationsCache.userId, key.userId),
-            key.leagueId === null
-                ? isNull(recommendationsCache.leagueId)
-                : eq(recommendationsCache.leagueId, key.leagueId),
-            eq(recommendationsCache.gameweek, key.gameweek),
-            eq(recommendationsCache.contextHash, key.contextHash),
-        ),
-    );
+		.where(
+			and(
+				eq(recommendationsCache.userId, key.userId),
+				key.leagueId === null
+					? isNull(recommendationsCache.leagueId)
+					: eq(recommendationsCache.leagueId, key.leagueId),
+				eq(recommendationsCache.gameweek, key.gameweek),
+				eq(recommendationsCache.contextHash, key.contextHash),
+			),
+		);
 	const row = rows[0];
 	if (!row) return null;
-	if (row.expiresAt && new Date(row.expiresAt).getTime() <= Date.now()) return null;
+	if (row.expiresAt && new Date(row.expiresAt).getTime() <= Date.now())
+		return null;
 	return row.payload as unknown;
 }
 
@@ -65,4 +66,3 @@ export async function writeRecommendationsCache(
 			},
 		});
 }
-

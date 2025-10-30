@@ -104,7 +104,7 @@ export const Route = createFileRoute("/api/alerts/fpl-ready")({
 						})
 						.from(user)
 						.innerJoin(userTeamData, eq(user.id, userTeamData.userId))
-					.where(isNotNull(userTeamData.fplTeamId));
+						.where(isNotNull(userTeamData.fplTeamId));
 
 					if (users.length === 0) {
 						return Response.json({

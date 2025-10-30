@@ -20,4 +20,3 @@ describe("evaluateCandidate", () => {
 		expect(b.score).toBeGreaterThan(a.score);
 	});
 });
-

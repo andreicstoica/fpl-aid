@@ -7,27 +7,38 @@ export const Route = createFileRoute("/")({
 	component: App,
 	loader: async (opts) => {
 		const { auth } = await import("@/utils/auth");
-		const { computeContextHash, readRecommendationsCache, writeRecommendationsCache } = await import(
-			"@/lib/fpl/cache"
+		const {
+			computeContextHash,
+			readRecommendationsCache,
+			writeRecommendationsCache,
+		} = await import("@/lib/fpl/cache");
+		const { WEIGHTS_VERSION, RECOMMENDATIONS_TTL_MS } = await import(
+			"@/lib/fpl/config"
 		);
-		const { WEIGHTS_VERSION, RECOMMENDATIONS_TTL_MS } = await import("@/lib/fpl/config");
-		const { computeRecommendations } = await import("@/lib/fpl/recommendations");
+		const { computeRecommendations } = await import(
+			"@/lib/fpl/recommendations"
+		);
 
 		const request = (opts as any)?.request as Request | undefined;
 		const headers = request?.headers ?? new Headers();
 		const session = await auth.api.getSession({ headers });
 		if (!session?.user) return { recommendations: null } as const;
 
-		const dashboardUrl = request ? new URL("/api/fpl-dashboard", request.url).toString() : "/api/fpl-dashboard";
+		const dashboardUrl = request
+			? new URL("/api/fpl-dashboard", request.url).toString()
+			: "/api/fpl-dashboard";
 		const [dashboardRes, bootstrapRes] = await Promise.all([
 			fetch(dashboardUrl, { headers: request?.headers }),
 			fetch("https://fantasy.premierleague.com/api/bootstrap-static/"),
 		]);
-		if (!dashboardRes.ok || !bootstrapRes.ok) return { recommendations: null } as const;
+		if (!dashboardRes.ok || !bootstrapRes.ok)
+			return { recommendations: null } as const;
 		const dashboardData = await dashboardRes.json();
 		const bootstrapData = await bootstrapRes.json();
 
-		const roster = Array.isArray(dashboardData?.roster) ? dashboardData.roster : [];
+		const roster = Array.isArray(dashboardData?.roster)
+			? dashboardData.roster
+			: [];
 		if (roster.length === 0) return { recommendations: null } as const;
 
 		const allPlayers = (bootstrapData?.elements || []).map((e: any) => ({

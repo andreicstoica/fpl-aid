@@ -153,8 +153,8 @@ export const Route = createFileRoute("/api/fpl-roster")({
 							multiplier: pick.multiplier,
 							status: player.status,
 							news: player.news,
-						chanceOfPlayingNextRound:
-							player.chance_of_playing_next_round ?? null,
+							chanceOfPlayingNextRound:
+								player.chance_of_playing_next_round ?? null,
 						};
 					});
 

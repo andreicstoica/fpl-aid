@@ -24,4 +24,3 @@ export function evaluateCandidate(candidate: FplRosterPlayer) {
 
 	return { score: weighted, scores };
 }
-

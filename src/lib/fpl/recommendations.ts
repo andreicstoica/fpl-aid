@@ -16,7 +16,19 @@ export interface RecommendationsPayload {
 
 export function computeRecommendations(
 	roster: FplRosterPlayer[],
-	allPlayers: Array<Pick<FplRosterPlayer, "id" | "name" | "team" | "position" | "price" | "form" | "pointsPerGame" | "expectedPoints">>,
+	allPlayers: Array<
+		Pick<
+			FplRosterPlayer,
+			| "id"
+			| "name"
+			| "team"
+			| "position"
+			| "price"
+			| "form"
+			| "pointsPerGame"
+			| "expectedPoints"
+		>
+	>,
 ): RecommendationsPayload {
 	const pool = buildCandidatePool(roster, allPlayers);
 	const out = selectSwapOut(roster);
@@ -45,4 +57,3 @@ export function computeRecommendations(
 		})),
 	};
 }
-

@@ -119,7 +119,7 @@ export interface FplRosterPlayer {
 	isViceCaptain: boolean;
 	multiplier: number;
 	status?: string; // FPL element status, e.g., 'i', 'd', 's', 'u', ...
-	news?: string;   // FPL element news string for injury/suspension context
+	news?: string; // FPL element news string for injury/suspension context
 	chanceOfPlayingNextRound?: number | null;
 }
 
@@ -148,10 +148,10 @@ export interface FplDashboardData {
 	roster: FplRosterPlayer[];
 	manager: FplManagerStats;
 	league: LeagueComparison;
-    recommendations?: Array<{
-        in: FplRosterPlayer;
-        out: FplRosterPlayer;
-        score: number;
-        rationale: string;
-    }>;
+	recommendations?: Array<{
+		in: FplRosterPlayer;
+		out: FplRosterPlayer;
+		score: number;
+		rationale: string;
+	}>;
 }

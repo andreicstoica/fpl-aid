@@ -18,4 +18,3 @@ export function getTtlUntil(date: Date): number {
 	const ms = Math.max(0, date.getTime() - Date.now());
 	return Math.min(ms, RECOMMENDATIONS_TTL_MS);
 }
-
