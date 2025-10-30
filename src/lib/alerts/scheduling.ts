@@ -77,7 +77,7 @@ export function computeEveningBeforeWindow(
 	const startTime = parseWindowTime(recipient.windowStart);
 	const endTime = parseWindowTime(recipient.windowEnd);
 
-	let windowStart = windowBase.set({
+	const windowStart = windowBase.set({
 		hour: startTime.hour,
 		minute: startTime.minute,
 		second: 0,
@@ -224,7 +224,7 @@ export function serializeNotificationPlan(
  * Used by fpl-ready endpoint to determine if now is within a user's preferred window.
  */
 export function getCurrentWindow(
-	now: DateTime,
+    _now: DateTime,
 	deadlineEpochMs: number,
 	hoursBefore: number,
 ): { startUtc: DateTime; endUtc: DateTime } {
@@ -250,7 +250,7 @@ export function isInWindow(
  * Simplified version for fpl-ready: assumes all users want X hours before deadline.
  */
 export function computeUserSendWindow(
-	recipient: NotificationRecipient,
+    _recipient: NotificationRecipient,
 	deadlineEpochMs: number,
 	defaultHoursBefore: number,
 ): { startUtc: DateTime; endUtc: DateTime } {

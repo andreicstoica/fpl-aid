@@ -19,7 +19,6 @@ function Group({
 				"flex w-fit [--clip-end:-1rem] [--clip-start:-1rem] *:pointer-coarse:after:min-w-auto",
 				className,
 			)}
-			role="group"
 			{...props}
 		>
 			{children}

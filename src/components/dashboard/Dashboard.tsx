@@ -27,7 +27,6 @@ export function Dashboard() {
 		retry: false,
 	});
 
-
 	if (dashboardLoading) {
 		return (
 			<div className="min-h-screen flex items-center justify-center py-8">
@@ -48,7 +47,9 @@ export function Dashboard() {
 				<div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
 					<Alert variant="error" className="max-w-2xl mx-auto">
 						<AlertTitle>Error loading dashboard</AlertTitle>
-						<AlertDescription>{(dashboardError as Error).message}</AlertDescription>
+						<AlertDescription>
+							{(dashboardError as Error).message}
+						</AlertDescription>
 					</Alert>
 				</div>
 			</div>
@@ -80,8 +81,8 @@ export function Dashboard() {
 					{manager && <ManagerStats manager={manager} />}
 					{league && <LeagueStats league={league} />}
 				</div>
-			{/* Recommendations under stats */}
-			<Recommendations items={dashboardData.recommendations || null} />
+				{/* Recommendations under stats */}
+				<Recommendations items={dashboardData.recommendations || null} />
 				{/* Soccer Field */}
 				<SoccerField roster={roster} />
 			</div>

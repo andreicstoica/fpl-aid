@@ -5,7 +5,11 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db/index"; // your drizzle instance
 import { userTeamData } from "@/db/schema";
 
-const defaultOrigins = ["http://localhost:3000", "http://localhost:3001", "https://fpl-aid.vercel.app"];
+const defaultOrigins = [
+	"http://localhost:3000",
+	"http://localhost:3001",
+	"https://fpl-aid.vercel.app",
+];
 const trustedOrigins = Array.from(
 	new Set(
 		[

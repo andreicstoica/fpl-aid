@@ -1,3 +1,8 @@
+import { config as loadEnv } from 'dotenv'
+// Load .env then .env.local (local overrides default)
+loadEnv()
+loadEnv({ path: '.env.local', override: true })
+
 import { defineConfig } from 'vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'

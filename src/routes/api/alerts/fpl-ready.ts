@@ -104,7 +104,7 @@ export const Route = createFileRoute("/api/alerts/fpl-ready")({
 						})
 						.from(user)
 						.innerJoin(userTeamData, eq(user.id, userTeamData.userId))
-					.where(isNotNull(userTeamData.fplTeamId));
+						.where(isNotNull(userTeamData.fplTeamId));
 
 					if (users.length === 0) {
 						return Response.json({
@@ -168,7 +168,6 @@ export const Route = createFileRoute("/api/alerts/fpl-ready")({
 							}
 						} catch (error) {
 							console.error(`Error processing user ${userRow.id}:`, error);
-							continue;
 						}
 					}
 

@@ -1,4 +1,13 @@
-import { boolean, integer, jsonb, pgTable, text, timestamp, index, unique } from "drizzle-orm/pg-core";
+import {
+	boolean,
+	integer,
+	jsonb,
+	pgTable,
+	text,
+	timestamp,
+	index,
+	unique,
+} from "drizzle-orm/pg-core";
 import type { FplDashboardData, FplRosterPlayer } from "@/types/fpl";
 
 export const user = pgTable("user", {

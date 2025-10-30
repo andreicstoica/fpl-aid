@@ -90,7 +90,8 @@ export interface FplBootstrapPlayer {
 	total_points: number;
 	form: string;
 	points_per_game: string;
-	expected_points: string;
+	ep_this: string | null; // expected points this gameweek
+	ep_next: string | null; // expected points next gameweek
 	news: string;
 	news_added?: string;
 	status: string;
@@ -119,7 +120,7 @@ export interface FplRosterPlayer {
 	isViceCaptain: boolean;
 	multiplier: number;
 	status?: string; // FPL element status, e.g., 'i', 'd', 's', 'u', ...
-	news?: string;   // FPL element news string for injury/suspension context
+	news?: string; // FPL element news string for injury/suspension context
 	chanceOfPlayingNextRound?: number | null;
 }
 
@@ -148,10 +149,14 @@ export interface FplDashboardData {
 	roster: FplRosterPlayer[];
 	manager: FplManagerStats;
 	league: LeagueComparison;
-    recommendations?: Array<{
-        in: FplRosterPlayer;
-        out: FplRosterPlayer;
-        score: number;
-        rationale: string;
-    }>;
+	recommendations?: Array<{
+		in: FplRosterPlayer;
+		out: FplRosterPlayer;
+		score: number;
+		rationale: string;
+		weeklyPointsDelta: number;
+		nextFixtureExpectedDelta: number;
+		valuePerMillion: number;
+		netSpend: number;
+	}>;
 }

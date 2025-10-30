@@ -1,6 +1,6 @@
 export const RECOMMENDATIONS_TTL_MS = 6 * 60 * 60 * 1000; // 6h max
 
-export const WEIGHTS_VERSION = "v1.1";
+export const WEIGHTS_VERSION = "v1.3";
 
 export const metricWeights = {
 	formDelta: 0.25,
@@ -18,4 +18,3 @@ export function getTtlUntil(date: Date): number {
 	const ms = Math.max(0, date.getTime() - Date.now());
 	return Math.min(ms, RECOMMENDATIONS_TTL_MS);
 }
-

@@ -5,4 +5,3 @@ import { normalize } from "@/lib/fpl/trends";
 export function formTrend(candidate: Pick<FplRosterPlayer, "form">) {
 	return normalize(candidate.form, 0, 10);
 }
-

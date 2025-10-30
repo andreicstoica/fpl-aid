@@ -10,4 +10,3 @@ export function slopeSimple(values: number[]): number {
 	if (values.length < 2) return 0;
 	return values[values.length - 1] - values[0];
 }
-
