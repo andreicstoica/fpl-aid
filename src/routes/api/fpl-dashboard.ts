@@ -177,6 +177,8 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 							isCaptain: pick.is_captain,
 							isViceCaptain: pick.is_vice_captain,
 							multiplier: pick.multiplier,
+							status: player.status,
+							news: player.news,
 						};
 					});
 

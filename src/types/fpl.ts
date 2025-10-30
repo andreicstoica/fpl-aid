@@ -94,6 +94,7 @@ export interface FplBootstrapPlayer {
 	news: string;
 	news_added?: string;
 	status: string;
+	chance_of_playing_next_round?: number | null;
 }
 
 export interface FplTeamPick {
@@ -117,6 +118,9 @@ export interface FplRosterPlayer {
 	isCaptain: boolean;
 	isViceCaptain: boolean;
 	multiplier: number;
+	status?: string; // FPL element status, e.g., 'i', 'd', 's', 'u', ...
+	news?: string;   // FPL element news string for injury/suspension context
+	chanceOfPlayingNextRound?: number | null;
 }
 
 // Dashboard Types

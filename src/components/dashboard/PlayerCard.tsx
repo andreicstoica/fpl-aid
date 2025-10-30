@@ -1,9 +1,13 @@
-import { DollarSign, Shield, Star, Target, TrendingUp } from "lucide-react";
+import { DollarSign, Shield, Star, Target, TrendingUp, AlertTriangle, Ban, TrendingDown, Hospital, Flag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { FplRosterPlayer } from "@/types/fpl";
 import { getTeamColors } from "@/types/teams";
+import {
+  isFormPlummeting,
+} from "@/utils/player-performance";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 interface PlayerCardProps {
 	player: FplRosterPlayer;
@@ -98,8 +102,62 @@ export function PlayerCard({ player }: PlayerCardProps) {
 		},
 	] as const;
 
+	// Availability and signals
+	const status = player.status;
+	const news = player.news;
+	const showInjury = status === "i";
+	const showSuspended = status === "s";
+	const showFormTank = isFormPlummeting(player);
+	const availabilityBorder =
+		(showInjury || showSuspended || player.chanceOfPlayingNextRound === 25 || player.chanceOfPlayingNextRound === 0)
+			? "border-red-400 border-2"
+			: player.chanceOfPlayingNextRound === 50
+				? "border-yellow-400 border-2"
+				: "border-white/40";
+
 	return (
 		<div className="relative w-full sm:w-52 md:w-56 lg:w-60">
+			{(showInjury || showSuspended || showFormTank) && (
+				<TooltipProvider>
+					<div className="absolute right-3 top-3 z-20 space-y-2 flex flex-col items-end">
+						{showInjury && (
+							<Tooltip>
+								<TooltipTrigger>
+									<Badge variant="warning" size="sm" className="flex items-center gap-1 shadow-sm cursor-help bg-amber-100 border-amber-400 text-black">
+										<Hospital className="h-3 w-3" />
+									</Badge>
+								</TooltipTrigger>
+								<TooltipContent className="px-3 py-2 text-xs font-semibold rounded-lg bg-amber-50 text-black shadow border border-amber-300">{news || "Injury"}</TooltipContent>
+							</Tooltip>
+						)}
+						{showSuspended && (
+							<Tooltip>
+								<TooltipTrigger>
+									<Badge variant="destructive" size="sm" className="flex items-center gap-1 shadow-sm cursor-help bg-red-600 text-white border-red-700">
+										<Flag className="h-3 w-3" />
+									</Badge>
+								</TooltipTrigger>
+								<TooltipContent className="px-3 py-2 text-xs font-semibold rounded-lg bg-red-50 text-red-900 shadow border border-red-400">
+									{news ? `Suspended for: ${news}` : "Suspended"}
+								</TooltipContent>
+							</Tooltip>
+						)}
+						{showFormTank && (
+							<Tooltip>
+								<TooltipTrigger>
+									<Badge variant="warning" size="sm" className="flex items-center gap-1 shadow-sm cursor-help bg-yellow-100 border-yellow-300 text-yellow-900">
+										<TrendingDown className="h-3 w-3" />
+									</Badge>
+								</TooltipTrigger>
+								<TooltipContent className="px-3 py-2 text-xs font-semibold rounded-lg bg-yellow-50 text-yellow-900 shadow border border-yellow-300">
+									{`Form down to ${player.form} (avg: ${player.pointsPerGame}, down ${player.pointsPerGame > 0 ? Math.round(100 * (1 - player.form / player.pointsPerGame)) : 0}%)`}
+								</TooltipContent>
+							</Tooltip>
+						)}
+					</div>
+				</TooltipProvider>
+			)}
+			{/* Captain/Vice as left-top badges: keep as-is */}
 			{(player.isCaptain || player.isViceCaptain) && (
 				<div className="absolute left-3 top-3 z-20 space-y-2">
 					{player.isCaptain && (
@@ -123,7 +181,7 @@ export function PlayerCard({ player }: PlayerCardProps) {
 				</div>
 			)}
 
-			<Card className="h-auto w-full overflow-hidden rounded-3xl border-white/40 bg-white/95 px-3 py-4 shadow-[0_1.125rem_2.1875rem_rgba(16,100,47,0.2)] backdrop-blur gap-1">
+			<Card className={cn("h-auto w-full overflow-hidden rounded-3xl border-2 bg-white/95 px-3 py-4 shadow-[0_1.125rem_2.1875rem_rgba(16,100,47,0.2)] backdrop-blur gap-1", availabilityBorder)}>
 				<div className="flex flex-col gap-1">
 					<TeamJersey team={player.team} />
 

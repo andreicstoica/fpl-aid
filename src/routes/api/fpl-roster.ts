@@ -151,6 +151,10 @@ export const Route = createFileRoute("/api/fpl-roster")({
 							isCaptain: pick.is_captain,
 							isViceCaptain: pick.is_vice_captain,
 							multiplier: pick.multiplier,
+							status: player.status,
+							news: player.news,
+						chanceOfPlayingNextRound:
+							player.chance_of_playing_next_round ?? null,
 						};
 					});
 
