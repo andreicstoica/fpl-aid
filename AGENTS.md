@@ -143,3 +143,54 @@ sequenceDiagram
     end
   end
 ```
+
+## Email Alerts Flow
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant VT as Val Town Cron
+  participant AlertAPI as /api/alerts/fpl-ready
+  participant DB as Drizzle_DB
+  participant FPL as FPL_APIs
+  participant Risk as Player Risk Logic
+  participant User as Users
+
+  loop Every 12 hours
+    VT->>AlertAPI: GET /api/alerts/fpl-ready<br/>(x-alert-secret header)
+    AlertAPI->>AlertAPI: Validate secret auth
+    
+    AlertAPI->>FPL: GET bootstrap-static
+    FPL-->>AlertAPI: current gameweek + deadline
+    
+    AlertAPI->>DB: Load users with FPL data
+    DB-->>AlertAPI: users (id, email, fplTeamId)
+    
+    loop For each user
+      AlertAPI->>FPL: GET entry/{teamId}/event/{gw}/picks
+      FPL-->>AlertAPI: squad picks + player data
+      
+      AlertAPI->>Risk: assessPlayerRisk(player)
+      Risk-->>AlertAPI: badge + news (injured/suspended/doubtful/form_dip)
+      
+      alt player has risk
+        AlertAPI->>AlertAPI: Include in recipients
+      else player is ok
+        AlertAPI->>AlertAPI: Skip
+      end
+    end
+    
+    AlertAPI-->>VT: { gameweek, deadlineUtc, recipients[] }
+    
+    loop For each recipient
+      VT->>VT: Check dedupe (userId:gameweek)
+      alt already sent
+        VT->>VT: Skip
+      else not sent
+        VT->>VT: Render HTML email with player risks
+        VT->>User: Send email via VT email()
+        VT->>VT: Store dedupe state
+      end
+    end
+  end
+```
