@@ -30,7 +30,7 @@ export function Recommendations(props: {
 		<Card className="p-3 sm:p-4">
 			<div className="text-sm font-semibold mb-2">Differential suggestions</div>
 			<div className="space-y-1">
-				{items.map((r, idx) => {
+				{items.map((r) => {
 					const rawNetSpend =
 						r.netSpend ?? (r.in.price ?? 0) - (r.out.price ?? 0);
 					const rawWeeklyDelta =
@@ -47,7 +47,7 @@ export function Recommendations(props: {
 					const valuePerMillion = formatSigned(rawValuePerMillion);
 					const nextFixtureDelta = formatSigned(rawNextFixtureDelta);
 					return (
-						<div key={idx} className="text-sm">
+						<div key={`${r.in.id}-${r.out.id}`} className="text-sm">
 							<Badge variant="secondary" className="mr-2">
 								{r.score.toFixed(2)}
 							</Badge>

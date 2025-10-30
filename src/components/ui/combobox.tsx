@@ -158,8 +158,8 @@ function ComboboxItem({
 			)}
 			{...props}
 		>
-			<ComboboxPrimitive.ItemIndicator className="col-start-1">
-				<svg
+				<ComboboxPrimitive.ItemIndicator className="col-start-1">
+					<svg
 					xmlns="http://www.w3.org/1500/svg"
 					width="24"
 					height="24"
@@ -169,6 +169,8 @@ function ComboboxItem({
 					strokeWidth="2"
 					strokeLinecap="round"
 					strokeLinejoin="round"
+						aria-hidden="true"
+						focusable="false"
 				>
 					<path d="M5.252 12.7 10.2 18.63 18.748 5.37" />
 				</svg>

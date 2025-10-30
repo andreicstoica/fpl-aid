@@ -1,5 +1,4 @@
 import type { FplBootstrapPlayer, FplRosterPlayer } from "@/types/fpl";
-import { formDelta } from "./metrics/formDelta";
 
 export type RiskBadge =
 	| "injured"

@@ -1,7 +1,7 @@
 import { eq, and, isNull } from "drizzle-orm";
 import { db } from "@/db/index";
 import { recommendationsCache } from "@/db/schema";
-import crypto from "crypto";
+import crypto from "node:crypto";
 
 export type CacheKey = {
 	userId: string;

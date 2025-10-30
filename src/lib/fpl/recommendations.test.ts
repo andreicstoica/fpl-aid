@@ -24,14 +24,14 @@ const p = (
 
 describe("computeRecommendations", () => {
 	it("returns up to 3 ranked items", () => {
-		const roster = [p(1, 4, 4, 6, 3.5)] as any;
+		const roster = [p(1, 4, 4, 6, 3.5)];
 		const all = [
 			p(1, 4, 4, 6, 3.5),
 			p(2, 9, 8, 6.5, 5.5),
 			p(3, 8, 8, 6.2, 5.2),
 			p(4, 7, 6, 6, 4.9),
 			p(5, 6, 6, 5.5, 4.8),
-		] as any;
+		];
 		const res = computeRecommendations(roster, all);
 		expect(res.items.length).toBeGreaterThan(0);
 		expect(res.items.length).toBeLessThanOrEqual(3);

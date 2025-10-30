@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
 			"@/lib/fpl/recommendations"
 		);
 
-		const request = (opts as any)?.request as Request | undefined;
+		const request = (opts as unknown as { request?: Request })?.request;
 		const headers = request?.headers ?? new Headers();
 		const session = await auth.api.getSession({ headers });
 		if (!session?.user) return { recommendations: null } as const;
@@ -41,20 +41,31 @@ export const Route = createFileRoute("/")({
 			: [];
 		if (roster.length === 0) return { recommendations: null } as const;
 
-		const allPlayers = (bootstrapData?.elements || []).map((e: any) => ({
+		type BootstrapElement = {
+			id: number;
+			web_name: string;
+			team: number;
+			element_type: number;
+			now_cost: number;
+			form: string;
+			points_per_game: string;
+			ep_next?: string;
+			ep_this?: string;
+		};
+		const allPlayers = (bootstrapData?.elements || []).map((e: BootstrapElement) => ({
 			id: e.id,
 			name: e.web_name,
 			team: String(e.team),
-			position: ((): any => {
+			position: (() => {
 				switch (e.element_type) {
 					case 1:
-						return "GKP";
+						return "GKP" as const;
 					case 2:
-						return "DEF";
+						return "DEF" as const;
 					case 3:
-						return "MID";
+						return "MID" as const;
 					default:
-						return "FWD";
+						return "FWD" as const;
 				}
 			})(),
 			price: (e.now_cost || 0) / 10,
@@ -65,7 +76,7 @@ export const Route = createFileRoute("/")({
 
 		const context = {
 			w: WEIGHTS_VERSION,
-			roster: roster.map((p: any) => ({ id: p.id, price: p.price })),
+			roster: roster.map((p: { id: number; price: number }) => ({ id: p.id, price: p.price })),
 			stamp: new Date().toDateString(),
 		};
 		const contextHash = computeContextHash(context);

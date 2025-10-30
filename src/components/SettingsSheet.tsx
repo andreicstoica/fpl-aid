@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { LogOut, Save } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +29,9 @@ export function SettingsSheet({ isOpen, onOpenChange }: SettingsSheetProps) {
 	const [fplTeamId, setFplTeamId] = useState("");
 	const [fplLeagueId, setFplLeagueId] = useState("");
 	const [isSaving, setIsSaving] = useState(false);
+	const emailId = useId();
+	const fplTeamInputId = useId();
+	const fplLeagueInputId = useId();
 
 	// Fetch user FPL settings from database
 	const { data: userSettings } = useQuery({
@@ -164,9 +167,9 @@ export function SettingsSheet({ isOpen, onOpenChange }: SettingsSheetProps) {
 				<div className="flex-1 space-y-6 overflow-y-auto p-4">
 					{/* User Info */}
 					<div className="space-y-2">
-						<Label htmlFor="email">Email</Label>
-						<Input
-							id="email"
+					<Label htmlFor={emailId}>Email</Label>
+					<Input
+						id={emailId}
 							value={session?.user?.email || ""}
 							disabled
 							className="bg-muted"
@@ -183,9 +186,9 @@ export function SettingsSheet({ isOpen, onOpenChange }: SettingsSheetProps) {
 						<h3 className="text-lg font-medium">FPL Settings</h3>
 
 						<div className="space-y-2">
-							<Label htmlFor="fplTeamId">FPL Team ID</Label>
-							<Input
-								id="fplTeamId"
+						<Label htmlFor={fplTeamInputId}>FPL Team ID</Label>
+						<Input
+							id={fplTeamInputId}
 								value={fplTeamId}
 								onChange={(e) => setFplTeamId(e.target.value)}
 								placeholder="Enter your FPL Team ID"
@@ -193,9 +196,9 @@ export function SettingsSheet({ isOpen, onOpenChange }: SettingsSheetProps) {
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="fplLeagueId">FPL League ID</Label>
-							<Input
-								id="fplLeagueId"
+						<Label htmlFor={fplLeagueInputId}>FPL League ID</Label>
+						<Input
+							id={fplLeagueInputId}
 								value={fplLeagueId}
 								onChange={(e) => setFplLeagueId(e.target.value)}
 								placeholder="Enter your FPL League ID"

@@ -168,7 +168,6 @@ export const Route = createFileRoute("/api/alerts/fpl-ready")({
 							}
 						} catch (error) {
 							console.error(`Error processing user ${userRow.id}:`, error);
-							continue;
 						}
 					}
 
