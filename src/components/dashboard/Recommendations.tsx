@@ -1,6 +1,6 @@
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { RecommendationItem } from "@/lib/fpl/recommendations";
+import { Card } from "@/components/ui/card";
+import type { RecommendationItem } from "@/types/fpl";
 
 const formatSigned = (value: number, digits = 2) => {
 	const factor = 10 ** digits;

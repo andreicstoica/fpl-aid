@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DateTime } from "luxon";
 import { eq, isNotNull } from "drizzle-orm";
+import { DateTime } from "luxon";
 import { db } from "@/db/index";
 import { user, userTeamData } from "@/db/schema";
-import type { FplBootstrapPlayer } from "@/types/fpl";
-import { assessPlayerRisk, type PlayerRiskInfo } from "@/lib/fpl/playerRisk";
 import { getCurrentWindow } from "@/lib/alerts/scheduling";
+import { assessPlayerRisk, type PlayerRiskInfo } from "@/lib/fpl/playerRisk";
+import type { FplBootstrapPlayer } from "@/types/fpl";
 
 const DEFAULT_WINDOW_HOURS = 14;
 const ALERT_SECRET_HEADER = "x-alert-secret";

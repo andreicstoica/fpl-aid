@@ -9,8 +9,8 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { LeagueStats } from "./LeagueStats";
 import { ManagerStats } from "./ManagerStats";
-import { SoccerField } from "./SoccerField";
 import { Recommendations } from "./Recommendations";
+import { SoccerField } from "./SoccerField";
 
 export function Dashboard() {
 	const {
@@ -24,6 +24,8 @@ export function Dashboard() {
 			if (!response.ok) throw new Error("Failed to fetch dashboard data");
 			return response.json();
 		},
+		staleTime: 5 * 60 * 1000,
+		gcTime: 10 * 60 * 1000,
 		retry: false,
 	});
 

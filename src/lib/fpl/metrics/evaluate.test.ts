@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { evaluateCandidate } from "./evaluate";
+import { describe, expect, it } from "vitest";
 import type { FplRosterPlayer } from "@/types/fpl";
+import { evaluateCandidate } from "./evaluate";
 
 const makePlayer = (over: Partial<FplRosterPlayer> = {}) => ({
 	id: 1,

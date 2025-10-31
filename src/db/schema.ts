@@ -1,11 +1,11 @@
 import {
 	boolean,
+	index,
 	integer,
 	jsonb,
 	pgTable,
 	text,
 	timestamp,
-	index,
 	unique,
 } from "drizzle-orm/pg-core";
 import type { FplDashboardData, FplRosterPlayer } from "@/types/fpl";

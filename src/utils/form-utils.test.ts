@@ -1,9 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
+	type SignUpFormData,
 	validateEmail,
 	validatePassword,
 	validateSignUpForm,
-	type SignUpFormData,
 } from "./form-utils";
 
 describe("form-utils", () => {
