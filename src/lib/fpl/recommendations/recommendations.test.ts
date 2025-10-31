@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { computeRecommendations } from "./recommendations";
+import { describe, expect, it } from "vitest";
+import { computeRecommendations } from ".";
 
 const p = (
 	id: number,

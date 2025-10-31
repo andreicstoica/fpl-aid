@@ -6,99 +6,34 @@ import { authClient } from "@/utils/auth-client";
 export const Route = createFileRoute("/")({
 	component: App,
 	loader: async (opts) => {
-		const { auth } = await import("@/utils/auth");
-		const {
-			computeContextHash,
-			readRecommendationsCache,
-			writeRecommendationsCache,
-		} = await import("@/lib/fpl/cache");
-		const { WEIGHTS_VERSION, RECOMMENDATIONS_TTL_MS } = await import(
-			"@/lib/fpl/config"
-		);
-		const { computeRecommendations } = await import(
-			"@/lib/fpl/recommendations"
-		);
+		const queryClient = opts.context.queryClient;
+		const request =
+			"request" in opts ? (opts as { request?: Request }).request : undefined;
 
-		const request = (opts as unknown as { request?: Request })?.request;
+		const { auth } = await import("@/utils/auth");
+
 		const headers = request?.headers ?? new Headers();
 		const session = await auth.api.getSession({ headers });
-		if (!session?.user) return { recommendations: null } as const;
+		if (!session?.user) {
+			// Clear any stale dashboard data when a user signs out so the query
+			// cache doesn't leak the last authenticated response.
+			queryClient.removeQueries({ queryKey: ["fpl-dashboard"] });
+			return { dashboardData: null };
+		}
 
 		const dashboardUrl = request
 			? new URL("/api/fpl-dashboard", request.url).toString()
 			: "/api/fpl-dashboard";
-		const [dashboardRes, bootstrapRes] = await Promise.all([
-			fetch(dashboardUrl, { headers: request?.headers }),
-			fetch("https://fantasy.premierleague.com/api/bootstrap-static/"),
-		]);
-		if (!dashboardRes.ok || !bootstrapRes.ok)
-			return { recommendations: null } as const;
+		const dashboardRes = await fetch(dashboardUrl, {
+			headers: request?.headers,
+		});
+		if (!dashboardRes.ok) {
+			return { dashboardData: null };
+		}
+
 		const dashboardData = await dashboardRes.json();
-		const bootstrapData = await bootstrapRes.json();
-
-		const roster = Array.isArray(dashboardData?.roster)
-			? dashboardData.roster
-			: [];
-		if (roster.length === 0) return { recommendations: null } as const;
-
-		type BootstrapElement = {
-			id: number;
-			web_name: string;
-			team: number;
-			element_type: number;
-			now_cost: number;
-			form: string;
-			points_per_game: string;
-			ep_next?: string;
-			ep_this?: string;
-		};
-		const allPlayers = (bootstrapData?.elements || []).map(
-			(e: BootstrapElement) => ({
-				id: e.id,
-				name: e.web_name,
-				team: String(e.team),
-				position: (() => {
-					switch (e.element_type) {
-						case 1:
-							return "GKP" as const;
-						case 2:
-							return "DEF" as const;
-						case 3:
-							return "MID" as const;
-						default:
-							return "FWD" as const;
-					}
-				})(),
-				price: (e.now_cost || 0) / 10,
-				form: parseFloat(e.form || "0") || 0,
-				pointsPerGame: parseFloat(e.points_per_game || "0") || 0,
-				expectedPoints: parseFloat(e.ep_next || e.ep_this || "0") || 0,
-			}),
-		);
-
-		const context = {
-			w: WEIGHTS_VERSION,
-			roster: roster.map((p: { id: number; price: number }) => ({
-				id: p.id,
-				price: p.price,
-			})),
-			stamp: new Date().toDateString(),
-		};
-		const contextHash = computeContextHash(context);
-		const key = {
-			userId: session.user.id,
-			leagueId: null,
-			gameweek: dashboardData?.manager?.currentGameweek || 0,
-			contextHash,
-		};
-
-		const cached = await readRecommendationsCache(key);
-		if (cached) return { recommendations: cached } as const;
-
-		const recs = computeRecommendations(roster, allPlayers);
-		const expiresAt = new Date(Date.now() + RECOMMENDATIONS_TTL_MS);
-		await writeRecommendationsCache(key, recs, expiresAt);
-		return { recommendations: recs } as const;
+		queryClient.setQueryData(["fpl-dashboard"], dashboardData);
+		return { dashboardData } as const;
 	},
 });
 

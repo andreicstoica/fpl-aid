@@ -2,6 +2,14 @@ import { createFileRoute } from "@tanstack/react-router";
 import { eq } from "drizzle-orm";
 import { db } from "@/db/index";
 import { userTeamData } from "@/db/schema";
+import { computeRecommendations } from "@/lib/fpl/recommendations";
+import {
+	buildRoster,
+	calculateAvgPointsPerWeek,
+	convertPrice,
+	getPositionName,
+	getTeamName,
+} from "@/lib/fpl/transformers";
 import type {
 	FplBootstrapPlayer,
 	FplDashboardData,
@@ -10,54 +18,15 @@ import type {
 	FplTeamPick,
 	LeagueComparison,
 } from "@/types/fpl";
-import { computeRecommendations } from "@/lib/fpl/recommendations";
-import { PREMIER_LEAGUE_TEAMS } from "@/types/teams";
 import { auth } from "@/utils/auth";
-import { getUserFplData } from "@/utils/user-fpl";
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-// Helper function to get team name by ID
-function getTeamName(teamId: number): string {
-	const team = PREMIER_LEAGUE_TEAMS.find((t) => t.id === teamId);
-	return team?.shortName || `Team ${teamId}`;
-}
-
-// Helper function to convert position number to string
-function getPositionName(elementType: number): "GKP" | "DEF" | "MID" | "FWD" {
-	switch (elementType) {
-		case 1:
-			return "GKP";
-		case 2:
-			return "DEF";
-		case 3:
-			return "MID";
-		case 4:
-			return "FWD";
-		default:
-			return "MID"; // fallback
-	}
-}
-
-// Helper function to convert price from 0.1 units to actual price
-function convertPrice(nowCost: number): number {
-	return nowCost / 10;
-}
-
-// Helper function to calculate average points per week
-function calculateAvgPointsPerWeek(
-	totalPoints: number,
-	currentGameweek: number,
-): number {
-	return currentGameweek > 0 ? totalPoints / currentGameweek : 0;
-}
 
 export const Route = createFileRoute("/api/fpl-dashboard")({
 	server: {
 		handlers: {
 			GET: async ({ request }) => {
 				try {
-					// Get session from request headers
 					const session = await auth.api.getSession({
 						headers: request.headers,
 					});
@@ -66,9 +35,10 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						return Response.json({ error: "Unauthorized" }, { status: 401 });
 					}
 
-					const userFplData = await getUserFplData(session.user.id);
+					const fplTeamId = session.user.fplTeamId;
+					const fplLeagueId = session.user.fplLeagueId;
 
-					if (!userFplData?.fplTeamId || !userFplData?.fplLeagueId) {
+					if (!fplTeamId || !fplLeagueId) {
 						return Response.json({
 							roster: [],
 							manager: null,
@@ -79,12 +49,17 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						});
 					}
 
-					const {
-						fplTeamId,
-						fplLeagueId,
-						dashboardCache,
-						dashboardCacheUpdatedAt,
-					} = userFplData;
+					const [userTeamRow] = await db
+						.select({
+							dashboardCache: userTeamData.dashboardCache,
+							dashboardCacheUpdatedAt: userTeamData.dashboardCacheUpdatedAt,
+						})
+						.from(userTeamData)
+						.where(eq(userTeamData.userId, session.user.id))
+						.limit(1);
+
+					const { dashboardCache = null, dashboardCacheUpdatedAt = null } =
+						userTeamRow ?? {};
 					const cacheTimestamp = dashboardCacheUpdatedAt
 						? new Date(dashboardCacheUpdatedAt)
 						: null;
@@ -97,7 +72,6 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						return Response.json(dashboardCache as FplDashboardData);
 					}
 
-					// Fetch all required data from FPL API
 					const [bootstrapResponse, teamResponse, leagueResponse] =
 						await Promise.all([
 							fetch("https://fantasy.premierleague.com/api/bootstrap-static/"),
@@ -152,39 +126,8 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						});
 					}
 
-					// Create a map of player data for quick lookup
-					const playerMap = new Map<number, FplBootstrapPlayer>();
-					players.forEach((player) => {
-						playerMap.set(player.id, player);
-					});
+					const roster: FplRosterPlayer[] = buildRoster({ picks, players });
 
-					// Build roster
-					const roster: FplRosterPlayer[] = picks.map((pick) => {
-						const player = playerMap.get(pick.element);
-						if (!player) {
-							throw new Error(`Player with ID ${pick.element} not found`);
-						}
-
-						return {
-							id: player.id,
-							name: player.web_name,
-							team: getTeamName(player.team),
-							position: getPositionName(player.element_type),
-							price: convertPrice(player.now_cost),
-							totalPoints: player.total_points,
-							form: parseFloat(player.form) || 0,
-							pointsPerGame: parseFloat(player.points_per_game) || 0,
-							expectedPoints:
-								parseFloat(player.ep_next || player.ep_this || "0") || 0,
-							isCaptain: pick.is_captain,
-							isViceCaptain: pick.is_vice_captain,
-							multiplier: pick.multiplier,
-							status: player.status,
-							news: player.news,
-						};
-					});
-
-					// Extract manager stats
 					const manager: FplManagerStats = {
 						totalPoints: teamData.summary_overall_points || 0,
 						currentGameweek: currentEvent,
@@ -193,7 +136,6 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						squadValue: (teamData.last_deadline_value || 0) / 10, // Convert from 0.1 units
 					};
 
-					// Calculate league comparison
 					const standings = leagueData?.standings?.results || [];
 					const userStanding = standings.find(
 						(s: { entry: number }) => s.entry === parseInt(fplTeamId, 10),
@@ -248,16 +190,16 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						}
 					}
 
-					// Build simplified allPlayers for recommendation engine
-					const allPlayers = (players || []).map((e) => ({
-						id: e.id,
-						name: e.web_name,
-						team: getTeamName(e.team),
-						position: getPositionName(e.element_type),
-						price: convertPrice(e.now_cost),
-						form: parseFloat(e.form || "0") || 0,
-						pointsPerGame: parseFloat(e.points_per_game || "0") || 0,
-						expectedPoints: parseFloat(e.expected_points || "0") || 0,
+					const allPlayers = players.map((player) => ({
+						id: player.id,
+						name: player.web_name,
+						team: getTeamName(player.team),
+						position: getPositionName(player.element_type),
+						price: convertPrice(player.now_cost),
+						form: parseFloat(player.form || "0") || 0,
+						pointsPerGame: parseFloat(player.points_per_game || "0") || 0,
+						expectedPoints:
+							parseFloat(player.ep_next || player.ep_this || "0") || 0,
 					}));
 
 					const recs = computeRecommendations(roster, allPlayers);
@@ -279,7 +221,6 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						recommendations: recs.items,
 					};
 
-					// Cache the dashboard data
 					await db
 						.update(userTeamData)
 						.set({

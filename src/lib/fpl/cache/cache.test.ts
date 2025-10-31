@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { computeContextHash } from "./cache";
+import { describe, expect, it } from "vitest";
+import { computeContextHash } from ".";
 
 describe("cache.computeContextHash", () => {
 	it("is deterministic and sensitive to changes", () => {

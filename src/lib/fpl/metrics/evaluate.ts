@@ -1,12 +1,17 @@
-import type { FplRosterPlayer } from "@/types/fpl";
 import { metricWeights } from "@/lib/fpl/config";
-import { formDelta } from "@/lib/fpl/metrics/formDelta";
-import { formTrend } from "@/lib/fpl/metrics/formTrend";
 import { expectedPointsDelta } from "@/lib/fpl/metrics/expectedPointsDelta";
 import { fixtureEase } from "@/lib/fpl/metrics/fixtureEase";
+import { formDelta } from "@/lib/fpl/metrics/formDelta";
+import { formTrend } from "@/lib/fpl/metrics/formTrend";
 import { valueSignal } from "@/lib/fpl/metrics/valueSignal";
+import type { FplRosterPlayer } from "@/types/fpl";
 
-export function evaluateCandidate(candidate: FplRosterPlayer) {
+export function evaluateCandidate(
+	candidate: Pick<
+		FplRosterPlayer,
+		"form" | "pointsPerGame" | "expectedPoints" | "price"
+	>,
+) {
 	const scores = {
 		formDelta: formDelta(candidate),
 		formTrend: formTrend(candidate),

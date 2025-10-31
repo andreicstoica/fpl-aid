@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { selectSwapOut, buildCandidatePool } from "./adapters";
+import { describe, expect, it } from "vitest";
 import type { FplRosterPlayer } from "@/types/fpl";
+import { buildCandidatePool, selectSwapOut } from ".";
 
 const p = (
 	id: number,

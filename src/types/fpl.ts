@@ -149,14 +149,22 @@ export interface FplDashboardData {
 	roster: FplRosterPlayer[];
 	manager: FplManagerStats;
 	league: LeagueComparison;
-	recommendations?: Array<{
-		in: FplRosterPlayer;
-		out: FplRosterPlayer;
-		score: number;
-		rationale: string;
-		weeklyPointsDelta: number;
-		nextFixtureExpectedDelta: number;
-		valuePerMillion: number;
-		netSpend: number;
-	}>;
+	recommendations?: RecommendationItem[];
+}
+
+export interface RecommendationScoredSwap {
+	in: FplRosterPlayer;
+	out: FplRosterPlayer;
+	score: number;
+	rationale: string;
+	weeklyPointsDelta: number;
+	nextFixtureExpectedDelta: number;
+	valuePerMillion: number;
+	netSpend: number;
+}
+
+export interface RecommendationItem extends RecommendationScoredSwap {}
+
+export interface RecommendationsPayload {
+	items: RecommendationItem[];
 }

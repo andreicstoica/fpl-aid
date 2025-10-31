@@ -1,12 +1,12 @@
-import { describe, expect, it } from "vitest";
 import { DateTime } from "luxon";
+import { describe, expect, it } from "vitest";
 import type { FplDeadlineAlertPayload } from "@/integrations/valtown/cron-alerts";
 import {
 	evaluateRecipientNotification,
-	serializeNotificationPlan,
 	getCurrentWindow,
 	isInWindow,
 	type NotificationRecipient,
+	serializeNotificationPlan,
 } from "./scheduling.ts";
 
 function buildAlert(

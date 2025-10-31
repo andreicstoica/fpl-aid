@@ -1,5 +1,5 @@
-import type { FplRosterPlayer } from "@/types/fpl";
 import { normalize } from "@/lib/fpl/trends";
+import type { FplRosterPlayer } from "@/types/fpl";
 
 export function valueSignal(
 	candidate: Pick<FplRosterPlayer, "price" | "expectedPoints">,

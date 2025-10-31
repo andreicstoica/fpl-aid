@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { assessPlayerRisk, getBadgeEmoji, type RiskBadge } from "./playerRisk";
+import { describe, expect, it } from "vitest";
 import type { FplBootstrapPlayer, FplRosterPlayer } from "@/types/fpl";
+import { assessPlayerRisk, getBadgeEmoji, type RiskBadge } from ".";
 
 function buildBootstrapPlayer(
 	overrides: Partial<FplBootstrapPlayer> = {},

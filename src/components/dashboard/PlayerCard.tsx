@@ -1,23 +1,23 @@
 import {
+	AlertTriangle,
+	Flag,
+	Hospital,
 	Shield,
 	Star,
 	TrendingDown,
-	Hospital,
-	Flag,
-	AlertTriangle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { FplRosterPlayer } from "@/types/fpl";
 import { getTeamColors } from "@/types/teams";
 import { isFormPlummeting } from "@/utils/player-performance";
-import {
-	Tooltip,
-	TooltipContent,
-	TooltipTrigger,
-	TooltipProvider,
-} from "@/components/ui/tooltip";
 
 interface PlayerCardProps {
 	player: FplRosterPlayer;
