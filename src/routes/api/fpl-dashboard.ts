@@ -27,7 +27,6 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 		handlers: {
 			GET: async ({ request }) => {
 				try {
-					// Get session from request headers
 					const session = await auth.api.getSession({
 						headers: request.headers,
 					});
@@ -36,12 +35,8 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						return Response.json({ error: "Unauthorized" }, { status: 401 });
 					}
 
-					const user = session.user as typeof session.user & {
-						fplTeamId?: string | null;
-						fplLeagueId?: string | null;
-					};
-					const fplTeamId = user?.fplTeamId ?? null;
-					const fplLeagueId = user?.fplLeagueId ?? null;
+					const fplTeamId = session.user.fplTeamId;
+					const fplLeagueId = session.user.fplLeagueId;
 
 					if (!fplTeamId || !fplLeagueId) {
 						return Response.json({
@@ -77,7 +72,6 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						return Response.json(dashboardCache as FplDashboardData);
 					}
 
-					// Fetch all required data from FPL API
 					const [bootstrapResponse, teamResponse, leagueResponse] =
 						await Promise.all([
 							fetch("https://fantasy.premierleague.com/api/bootstrap-static/"),
@@ -132,10 +126,8 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						});
 					}
 
-					// Create a map of player data for quick lookup
 					const roster: FplRosterPlayer[] = buildRoster({ picks, players });
 
-					// Extract manager stats
 					const manager: FplManagerStats = {
 						totalPoints: teamData.summary_overall_points || 0,
 						currentGameweek: currentEvent,
@@ -144,7 +136,6 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						squadValue: (teamData.last_deadline_value || 0) / 10, // Convert from 0.1 units
 					};
 
-					// Calculate league comparison
 					const standings = leagueData?.standings?.results || [];
 					const userStanding = standings.find(
 						(s: { entry: number }) => s.entry === parseInt(fplTeamId, 10),
@@ -199,7 +190,6 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						}
 					}
 
-					// Build simplified allPlayers for recommendation engine
 					const allPlayers = players.map((player) => ({
 						id: player.id,
 						name: player.web_name,
@@ -231,7 +221,6 @@ export const Route = createFileRoute("/api/fpl-dashboard")({
 						recommendations: recs.items,
 					};
 
-					// Cache the dashboard data
 					await db
 						.update(userTeamData)
 						.set({

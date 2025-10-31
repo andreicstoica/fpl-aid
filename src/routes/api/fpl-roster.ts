@@ -17,7 +17,6 @@ export const Route = createFileRoute("/api/fpl-roster")({
 		handlers: {
 			GET: async ({ request }) => {
 				try {
-					// Get session from request headers
 					const session = await auth.api.getSession({
 						headers: request.headers,
 					});
@@ -26,10 +25,7 @@ export const Route = createFileRoute("/api/fpl-roster")({
 						return Response.json({ error: "Unauthorized" }, { status: 401 });
 					}
 
-					const user = session.user as typeof session.user & {
-						fplTeamId?: string | null;
-					};
-					const fplTeamId = user?.fplTeamId ?? null;
+					const fplTeamId = session.user.fplTeamId;
 
 					if (!fplTeamId) {
 						return Response.json({
@@ -62,7 +58,6 @@ export const Route = createFileRoute("/api/fpl-roster")({
 						return Response.json({ roster: rosterCache as FplRosterPlayer[] });
 					}
 
-					// Fetch base data from FPL API
 					const [bootstrapResponse, teamResponse] = await Promise.all([
 						fetch("https://fantasy.premierleague.com/api/bootstrap-static/"),
 						fetch(`https://fantasy.premierleague.com/api/entry/${fplTeamId}/`),
@@ -110,7 +105,6 @@ export const Route = createFileRoute("/api/fpl-roster")({
 						});
 					}
 
-					// Create a map of player data for quick lookup
 					const roster: FplRosterPlayer[] = buildRoster({ picks, players });
 
 					await db

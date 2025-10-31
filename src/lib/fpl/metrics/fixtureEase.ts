@@ -1,5 +1,4 @@
 // Without a fixture model, use expectedPoints proxy as ease signal.
-
 import { normalize } from "@/lib/fpl/trends";
 import type { FplRosterPlayer } from "@/types/fpl";
 
