@@ -11,9 +11,10 @@ import tailwindcss from '@tailwindcss/vite'
 import { nitroV2Plugin } from '@tanstack/nitro-v2-vite-plugin'
 import neon from './neon-vite-plugin.ts'
 
-const config = defineConfig({
+const config = defineConfig(({ mode }) => ({
   plugins: [
-    neon,
+    // Only include Neon plugin in development (it's for creating claimable databases)
+    ...(mode === 'development' ? [neon] : []),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
@@ -26,6 +27,6 @@ const config = defineConfig({
     }),
     viteReact(),
   ],
-})
+}))
 
 export default config
